@@ -1,0 +1,67 @@
+{
+  "common": {
+    "sign_in": "సైన్ ఇన్",
+    "sign_out": "సైన్ అవుట్",
+    "cancel": "రద్దు",
+    "save": "సేవ్",
+    "continue": "కొనసాగించు",
+    "back": "వెనక్కి",
+    "loading": "లోడ్ అవుతోంది…",
+    "error_generic": "ఏదో తప్పు జరిగింది. మళ్ళీ ప్రయత్నించండి.",
+    "required": "అవసరం"
+  },
+  "auth": {
+    "login_title": "FarmHeaven కి స్వాగతం",
+    "login_subtitle": "మీ ఫోన్ నంబర్‌తో సైన్ ఇన్ అవ్వండి. మేము ఒక కోడ్ పంపిస్తాము.",
+    "phone_label": "ఫోన్ నంబర్",
+    "phone_placeholder": "+91 98XX XX XXXX",
+    "send_code": "కోడ్ పంపించండి",
+    "otp_label": "6-అంకెల కోడ్ ఎంటర్ చేయండి",
+    "verify": "ధృవీకరించండి",
+    "resend": "కోడ్ మళ్ళీ పంపించు",
+    "tos_agreement": "కొనసాగించడం ద్వారా మీరు మా {terms} మరియు {privacy} అంగీకరిస్తారు."
+  },
+  "onboarding": {
+    "title": "మీ ఫారం సెట్ చేయండి",
+    "subtitle": "ప్రాథమిక వివరాలు మాత్రమే — తర్వాత మార్చవచ్చు.",
+    "org_name": "సంస్థ పేరు",
+    "farm_name": "ఫారం పేరు",
+    "slug": "ఫారం స్లగ్",
+    "slug_hint": "URL కోసం. చిన్న అక్షరాలు, సంఖ్యలు, హైఫన్లు.",
+    "total_acres": "మొత్తం ఎకరాలు",
+    "address": "చిరునామా",
+    "pincode": "పిన్‌కోడ్",
+    "state": "రాష్ట్రం",
+    "create": "ఫారం సృష్టించండి"
+  },
+  "nav": {
+    "operate": "నిర్వహణ",
+    "sell": "విక్రయం",
+    "analyze": "విశ్లేషణ",
+    "field": "క్షేత్రం",
+    "system": "వ్యవస్థ",
+    "dashboard": "డాష్‌బోర్డ్",
+    "livestock": "పశువులు",
+    "crops": "పంటలు",
+    "iot": "IoT",
+    "inventory": "ఇన్వెంటరీ",
+    "tasks": "పనులు",
+    "vet": "వెట్",
+    "orders": "ఆర్డర్లు",
+    "customers": "కస్టమర్లు",
+    "storefront": "స్టోర్",
+    "finance": "ఆర్థికం",
+    "welfare": "సంక్షేమం",
+    "reports": "నివేదికలు",
+    "worker": "వర్కర్ యాప్",
+    "settings": "సెట్టింగ్‌లు"
+  },
+  "dashboard": {
+    "morning": "గుడ్ మార్నింగ్, {name}",
+    "today": "ఈ రోజు పాలు",
+    "eggs": "గుడ్లు",
+    "tasks_today": "ఈ రోజు పనులు",
+    "revenue_week": "ఈ వారం ఆదాయం",
+    "welfare_score": "ఒత్తిడి లేని గంటలు"
+  }
+}

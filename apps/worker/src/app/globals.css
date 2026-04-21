@@ -1,0 +1,9 @@
+@import '@farmheaven/ui/styles/globals.css';
+
+/* Worker-specific: larger touch targets, mobile-first */
+@layer base {
+  button,
+  a {
+    min-height: 44px;
+  }
+}

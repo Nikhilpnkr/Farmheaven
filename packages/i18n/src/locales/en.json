@@ -1,0 +1,67 @@
+{
+  "common": {
+    "sign_in": "Sign in",
+    "sign_out": "Sign out",
+    "cancel": "Cancel",
+    "save": "Save",
+    "continue": "Continue",
+    "back": "Back",
+    "loading": "Loading…",
+    "error_generic": "Something went wrong. Please try again.",
+    "required": "Required"
+  },
+  "auth": {
+    "login_title": "Welcome to FarmHeaven",
+    "login_subtitle": "Sign in with your phone number. We'll send you a one-time code.",
+    "phone_label": "Phone number",
+    "phone_placeholder": "+91 98XX XX XXXX",
+    "send_code": "Send code",
+    "otp_label": "Enter the 6-digit code",
+    "verify": "Verify and continue",
+    "resend": "Resend code",
+    "tos_agreement": "By continuing you agree to our {terms} and {privacy}."
+  },
+  "onboarding": {
+    "title": "Set up your farm",
+    "subtitle": "Just the basics — you can change anything later.",
+    "org_name": "Organisation name",
+    "farm_name": "Farm name",
+    "slug": "Farm slug",
+    "slug_hint": "Used in URLs. Lowercase letters, numbers, hyphens.",
+    "total_acres": "Total acres",
+    "address": "Address",
+    "pincode": "Pincode",
+    "state": "State",
+    "create": "Create farm"
+  },
+  "nav": {
+    "operate": "Operate",
+    "sell": "Sell",
+    "analyze": "Analyze",
+    "field": "Field",
+    "system": "System",
+    "dashboard": "Dashboard",
+    "livestock": "Livestock",
+    "crops": "Crops & Fields",
+    "iot": "IoT & Automation",
+    "inventory": "Inventory",
+    "tasks": "Tasks & People",
+    "vet": "Vet Workspace",
+    "orders": "Orders",
+    "customers": "Customers",
+    "storefront": "Storefront",
+    "finance": "Finance",
+    "welfare": "Welfare & Carbon",
+    "reports": "Reports",
+    "worker": "Worker App",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "morning": "Good morning, {name}",
+    "today": "Today's milk",
+    "eggs": "Eggs collected",
+    "tasks_today": "Tasks today",
+    "revenue_week": "Revenue this week",
+    "welfare_score": "Stress-free hours"
+  }
+}

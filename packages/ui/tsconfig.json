@@ -1,0 +1,12 @@
+{
+  "extends": "@farmheaven/config/tsconfig.library.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "tailwind.preset.ts"],
+  "exclude": ["node_modules", "dist"]
+}

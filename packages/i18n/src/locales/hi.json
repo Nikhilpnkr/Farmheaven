@@ -1,0 +1,67 @@
+{
+  "common": {
+    "sign_in": "साइन इन",
+    "sign_out": "साइन आउट",
+    "cancel": "रद्द करें",
+    "save": "सहेजें",
+    "continue": "जारी रखें",
+    "back": "वापस",
+    "loading": "लोड हो रहा है…",
+    "error_generic": "कुछ गलत हो गया। कृपया पुनः प्रयास करें।",
+    "required": "आवश्यक"
+  },
+  "auth": {
+    "login_title": "FarmHeaven में आपका स्वागत है",
+    "login_subtitle": "अपने फोन नंबर से साइन इन करें। हम आपको एक कोड भेजेंगे।",
+    "phone_label": "फोन नंबर",
+    "phone_placeholder": "+91 98XX XX XXXX",
+    "send_code": "कोड भेजें",
+    "otp_label": "6-अंक का कोड दर्ज करें",
+    "verify": "सत्यापित करें",
+    "resend": "कोड पुनः भेजें",
+    "tos_agreement": "जारी रखकर आप हमारी {terms} और {privacy} से सहमत होते हैं।"
+  },
+  "onboarding": {
+    "title": "अपना फार्म सेट करें",
+    "subtitle": "बुनियादी जानकारी — बाद में बदल सकते हैं।",
+    "org_name": "संगठन का नाम",
+    "farm_name": "फार्म का नाम",
+    "slug": "फार्म स्लग",
+    "slug_hint": "URL के लिए। छोटे अक्षर, संख्या, हाइफ़न।",
+    "total_acres": "कुल एकड़",
+    "address": "पता",
+    "pincode": "पिनकोड",
+    "state": "राज्य",
+    "create": "फार्म बनाएं"
+  },
+  "nav": {
+    "operate": "संचालन",
+    "sell": "बिक्री",
+    "analyze": "विश्लेषण",
+    "field": "क्षेत्र",
+    "system": "सिस्टम",
+    "dashboard": "डैशबोर्ड",
+    "livestock": "पशुधन",
+    "crops": "फसलें",
+    "iot": "IoT",
+    "inventory": "इन्वेंटरी",
+    "tasks": "कार्य",
+    "vet": "वेट",
+    "orders": "ऑर्डर",
+    "customers": "ग्राहक",
+    "storefront": "स्टोर",
+    "finance": "वित्त",
+    "welfare": "कल्याण",
+    "reports": "रिपोर्ट",
+    "worker": "वर्कर ऐप",
+    "settings": "सेटिंग्स"
+  },
+  "dashboard": {
+    "morning": "सुप्रभात, {name}",
+    "today": "आज का दूध",
+    "eggs": "अंडे",
+    "tasks_today": "आज के कार्य",
+    "revenue_week": "इस सप्ताह की आय",
+    "welfare_score": "तनाव-मुक्त घंटे"
+  }
+}
