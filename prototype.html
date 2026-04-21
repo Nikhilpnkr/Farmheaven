@@ -1,0 +1,1607 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FarmHeaven — Operator Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Telugu:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root {
+    --leaf-600:#3B7A3F; --leaf-500:#4E9E54; --leaf-50:#EAF3EB;
+    --soil-700:#5B3A1E; --soil-500:#8B6A4A; --soil-50:#F5EEE4;
+    --turmeric-500:#E0A415; --turmeric-50:#FDF4DC;
+    --indigo-600:#3B4CA0; --indigo-50:#E8ECFB;
+    --success:#2E7D32; --success-50:#E7F3E8;
+    --warning:#E59400; --warning-50:#FFF1D9;
+    --danger:#C62828;  --danger-50:#FBE7E7;
+    --info:#1565C0;    --info-50:#E3EFFB;
+    --canvas:#FAF7F0; --raised:#FFFFFF; --sunken:#F2EDE0;
+    --border-subtle:#E5DFD0; --border-strong:#C4BBA6;
+    --text-primary:#1F1B16; --text-secondary:#5A5346; --text-muted:#8A8372;
+    --r-sm:4px; --r-md:8px; --r-lg:12px; --r-xl:16px;
+    --elev-1:0 1px 2px rgba(68,52,36,.06);
+    --elev-2:0 2px 4px rgba(68,52,36,.08),0 1px 2px rgba(68,52,36,.04);
+    --elev-3:0 8px 16px rgba(68,52,36,.10),0 2px 4px rgba(68,52,36,.06);
+    --sidebar-w:252px;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:"Inter","Noto Sans Telugu",system-ui,sans-serif;background:var(--canvas);color:var(--text-primary);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4{margin:0;font-weight:600;line-height:1.3}
+  h1{font-size:24px}h2{font-size:20px}h3{font-size:18px}h4{font-size:16px}
+  .brand-font{font-family:"Fraunces",serif}
+  .mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+
+  /* layout */
+  .app{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh}
+  .sidebar{background:linear-gradient(180deg,#1F1B16 0%,#2B241C 100%);color:#EFE8D7;padding:18px 12px;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .sidebar-logo{display:flex;align-items:center;gap:10px;padding:6px 10px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:10px}
+  .logo-mark{width:36px;height:36px;border-radius:10px;background:radial-gradient(circle at 30% 30%,var(--leaf-500),var(--leaf-600) 60%,#2a5a2e);display:flex;align-items:center;justify-content:center;color:white;box-shadow:inset 0 0 0 2px rgba(255,255,255,.08),0 2px 4px rgba(0,0,0,.4)}
+  .logo-text{display:flex;flex-direction:column;line-height:1.1}
+  .logo-text .name{font-family:"Fraunces";font-weight:700;font-size:17px;color:#F5EFE2}
+  .logo-text .sub{font-size:11px;color:#B8B09E}
+  .nav-section{font-size:10px;color:#8A8372;text-transform:uppercase;letter-spacing:.1em;padding:12px 10px 4px}
+  .nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;color:#D8D0BE;font-weight:500;text-decoration:none;font-size:13px;cursor:pointer;transition:all 160ms cubic-bezier(0.2,0,0,1)}
+  .nav a:hover{background:rgba(255,255,255,.06);color:#FFF}
+  .nav a.active{background:linear-gradient(90deg,rgba(78,158,84,.24),rgba(78,158,84,.08));color:#FFF;box-shadow:inset 2px 0 0 var(--leaf-500)}
+  .nav a .count{margin-left:auto;background:var(--danger);color:white;font-size:10px;padding:1px 6px;border-radius:999px;font-weight:600}
+  .nav a .new{margin-left:auto;background:var(--turmeric-500);color:#1F1B16;font-size:9px;padding:1px 6px;border-radius:999px;font-weight:700;letter-spacing:.04em}
+  .nav a i[data-lucide]{width:16px;height:16px;flex-shrink:0}
+  .sidebar-footer{position:sticky;bottom:-18px;margin-top:20px;padding:10px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,transparent,#1F1B16 30%)}
+  .user-avatar{width:34px;height:34px;border-radius:50%;background:var(--turmeric-500);color:#1F1B16;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  .user-info{line-height:1.2;font-size:13px;color:#D8D0BE}
+  .user-info .sub{font-size:11px;color:#8A8372}
+
+  /* main */
+  .main{display:flex;flex-direction:column;min-width:0}
+  .topbar{background:var(--raised);border-bottom:1px solid var(--border-subtle);padding:10px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10}
+  .search{flex:1;max-width:480px;display:flex;align-items:center;gap:8px;background:var(--sunken);border:1px solid var(--border-subtle);border-radius:10px;padding:8px 12px;color:var(--text-secondary)}
+  .search input{flex:1;background:transparent;border:0;outline:none;font-size:14px;color:var(--text-primary);font-family:inherit}
+  .kbd{font-family:"JetBrains Mono";font-size:11px;color:var(--text-muted);padding:2px 6px;background:var(--raised);border:1px solid var(--border-subtle);border-radius:4px}
+  .topbar-action{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);border:1px solid var(--border-subtle);background:var(--raised);cursor:pointer;position:relative}
+  .topbar-action:hover{background:var(--sunken)}
+  .dot-badge{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--danger);border-radius:50%;border:2px solid white}
+  .weather-chip{display:flex;align-items:center;gap:8px;padding:6px 10px 6px 8px;border:1px solid var(--border-subtle);border-radius:999px;background:var(--raised);font-size:13px}
+  .weather-icon{width:22px;height:22px;background:linear-gradient(135deg,#F4C14A,#E0A415);border-radius:50%;position:relative;overflow:hidden}
+  .weather-icon::after{content:"";position:absolute;inset:6px 4px 0 10px;background:#CFD8DC;border-radius:50%}
+  .lang-toggle{display:flex;background:var(--sunken);border-radius:999px;padding:2px;border:1px solid var(--border-subtle);font-size:12px;font-weight:600}
+  .lang-toggle span{padding:4px 10px;border-radius:999px;cursor:pointer;color:var(--text-muted)}
+  .lang-toggle span.active{background:var(--leaf-600);color:white}
+
+  /* content */
+  .content{padding:24px;max-width:1600px;width:100%;margin:0 auto}
+  .page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;gap:16px;flex-wrap:wrap}
+  .page-title{font-size:26px;font-weight:700}
+  .page-subtitle{color:var(--text-secondary);font-size:14px;margin-top:4px}
+
+  /* buttons */
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;border:1px solid transparent;font-family:inherit;font-weight:500;font-size:13.5px;cursor:pointer;transition:all 160ms cubic-bezier(0.2,0,0,1)}
+  .btn i{width:16px;height:16px}
+  .btn-primary{background:var(--leaf-600);color:white;box-shadow:var(--elev-1)}
+  .btn-primary:hover{background:var(--leaf-500)}
+  .btn-secondary{background:var(--raised);border-color:var(--border-strong);color:var(--text-primary)}
+  .btn-secondary:hover{background:var(--sunken)}
+  .btn-ghost{background:transparent;color:var(--text-secondary)}
+  .btn-ghost:hover{background:var(--sunken);color:var(--text-primary)}
+  .btn-danger{background:var(--danger);color:white}
+
+  /* banners */
+  .alert-banner{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;margin-bottom:16px;background:linear-gradient(90deg,var(--warning-50),#FFF8EA);border:1px solid #F0D896;color:#6B4A00}
+  .alert-banner.danger{background:linear-gradient(90deg,var(--danger-50),#FFEFEF);border-color:#F1B5B5;color:#7A1C1C}
+  .alert-banner.info{background:linear-gradient(90deg,var(--info-50),#EEF5FC);border-color:#B8D1EC;color:#0D3E73}
+  .alert-banner.success{background:linear-gradient(90deg,var(--success-50),#F2FAF3);border-color:#B5D9B8;color:#1E4A20}
+  .alert-banner i[data-lucide]{width:20px;height:20px;flex-shrink:0}
+  .alert-banner .title{font-weight:600}
+
+  /* grid */
+  .grid{display:grid;gap:16px}
+  .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid-8-4{grid-template-columns:2fr 1fr}
+  .grid-5-7{grid-template-columns:5fr 7fr}
+  .grid-7-5{grid-template-columns:7fr 5fr}
+  .grid-6-6{grid-template-columns:1fr 1fr}
+  @media(max-width:1100px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-8-4,.grid-5-7,.grid-7-5,.grid-6-6{grid-template-columns:1fr}}
+
+  /* card */
+  .card{background:var(--raised);border:1px solid var(--border-subtle);border-radius:12px;padding:18px;box-shadow:var(--elev-1)}
+  .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px}
+  .card-title{font-size:13px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em}
+  .card-action{color:var(--text-muted);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px}
+  .card-action:hover{color:var(--leaf-600)}
+
+  /* metrics */
+  .metric-card{position:relative;overflow:hidden}
+  .metric-card::before{content:"";position:absolute;inset:auto 0 0 0;height:3px;background:linear-gradient(90deg,var(--leaf-500),var(--leaf-600))}
+  .metric-card.turmeric::before{background:linear-gradient(90deg,var(--turmeric-500),#b8820a)}
+  .metric-card.indigo::before{background:linear-gradient(90deg,var(--indigo-600),#1f2a6a)}
+  .metric-card.soil::before{background:linear-gradient(90deg,var(--soil-500),var(--soil-700))}
+  .metric-card.danger::before{background:linear-gradient(90deg,var(--danger),#8a1515)}
+  .metric-value{font-size:28px;font-weight:700;line-height:1.1;letter-spacing:-0.01em}
+  .metric-label{font-size:12.5px;color:var(--text-secondary);margin-bottom:2px}
+  .metric-unit{font-size:13px;color:var(--text-muted);font-weight:500}
+  .metric-delta{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;margin-top:8px;padding:2px 8px;border-radius:999px}
+  .metric-delta.up{background:var(--success-50);color:var(--success)}
+  .metric-delta.down{background:var(--danger-50);color:var(--danger)}
+  .metric-delta.neu{background:var(--sunken);color:var(--text-secondary)}
+  .auto-tag{position:absolute;top:14px;right:14px;font-size:10px;background:var(--leaf-50);color:var(--leaf-600);padding:3px 7px;border-radius:999px;font-weight:600;display:flex;align-items:center;gap:4px}
+  .new-tag{position:absolute;top:14px;right:14px;font-size:10px;background:var(--turmeric-500);color:#1F1B16;padding:3px 7px;border-radius:999px;font-weight:700;letter-spacing:.04em}
+
+  /* chart wrappers (fixes infinite height) */
+  .spark-wrap{position:relative;height:34px;margin-top:10px;width:100%}
+  .chart-wrap{position:relative;height:240px;width:100%}
+  .chart-wrap-sm{position:relative;height:160px;width:100%}
+  .chart-wrap-lg{position:relative;height:320px;width:100%}
+  .sensor-chart-wrap{position:relative;height:34px;width:100%}
+  .spark-wrap canvas,.chart-wrap canvas,.chart-wrap-sm canvas,.chart-wrap-lg canvas,.sensor-chart-wrap canvas{position:absolute;inset:0}
+
+  /* chips */
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:500;background:var(--sunken);color:var(--text-secondary)}
+  .chip-dot{width:6px;height:6px;border-radius:50%}
+  .chip.healthy{background:var(--success-50);color:var(--success)}.chip.healthy .chip-dot{background:var(--success)}
+  .chip.heat{background:var(--turmeric-50);color:#8a6008}.chip.heat .chip-dot{background:var(--turmeric-500)}
+  .chip.pregnant{background:var(--indigo-50);color:var(--indigo-600)}.chip.pregnant .chip-dot{background:var(--indigo-600)}
+  .chip.sick{background:var(--danger-50);color:var(--danger)}.chip.sick .chip-dot{background:var(--danger)}
+  .chip.weaning{background:var(--soil-50);color:var(--soil-700)}.chip.weaning .chip-dot{background:var(--soil-500)}
+  .chip.info{background:var(--info-50);color:var(--info)}.chip.info .chip-dot{background:var(--info)}
+  .chip.warn{background:var(--warning-50);color:#8a5b00}.chip.warn .chip-dot{background:var(--warning)}
+  .chip.cert{background:var(--leaf-50);color:var(--leaf-600)}.chip.cert .chip-dot{background:var(--leaf-600)}
+
+  /* tasks */
+  .task-row{display:grid;grid-template-columns:auto auto 1fr auto auto;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border-subtle)}
+  .task-row:last-child{border-bottom:0}
+  .task-row:hover{background:var(--sunken)}
+  .task-check{width:18px;height:18px;border:1.5px solid var(--border-strong);border-radius:4px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  .task-check.done{background:var(--leaf-600);border-color:var(--leaf-600)}
+  .task-check.done::after{content:"";width:9px;height:5px;border-left:2px solid white;border-bottom:2px solid white;transform:rotate(-45deg);margin-top:-2px}
+  .task-title{font-weight:500;font-size:14px}
+  .task-title.strike{text-decoration:line-through;color:var(--text-muted)}
+  .task-meta{font-size:12px;color:var(--text-muted);margin-top:2px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .task-priority{width:3px;align-self:stretch;border-radius:2px}
+  .task-priority.high{background:var(--danger)}
+  .task-priority.med{background:var(--turmeric-500)}
+  .task-priority.low{background:var(--border-strong)}
+
+  /* farm map */
+  .farm-map{position:relative;height:360px;border-radius:12px;overflow:hidden;background:radial-gradient(circle at 20% 30%,rgba(78,158,84,.25),transparent 40%),radial-gradient(circle at 70% 60%,rgba(224,164,21,.15),transparent 45%),radial-gradient(circle at 80% 20%,rgba(59,76,160,.1),transparent 35%),linear-gradient(135deg,#D9E0BF 0%,#BFC9A0 100%);border:1px solid var(--border-subtle)}
+  .map-zone{position:absolute;border:2px dashed rgba(31,27,22,.3);border-radius:8px;padding:6px 8px;font-size:11px;font-weight:600;backdrop-filter:blur(2px)}
+  .map-zone.crop{background:rgba(78,158,84,.25);color:#1a3d1c;border-color:var(--leaf-600)}
+  .map-zone.dairy{background:rgba(224,164,21,.22);color:#5a4008;border-color:var(--turmeric-500)}
+  .map-zone.poultry{background:rgba(59,76,160,.18);color:#1a265c;border-color:var(--indigo-600)}
+  .map-pin{position:absolute;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:white;font-weight:600;box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid white}
+  .map-pin.live{animation:pulse 2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(78,158,84,.5)}50%{box-shadow:0 0 0 8px rgba(78,158,84,0)}}
+
+  /* table */
+  .table{width:100%;border-collapse:collapse;font-size:13.5px}
+  .table th{text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);padding:10px 12px;background:var(--sunken);border-bottom:1px solid var(--border-subtle)}
+  .table th:first-child{border-top-left-radius:8px}
+  .table th:last-child{border-top-right-radius:8px}
+  .table td{padding:12px;border-bottom:1px solid var(--border-subtle);vertical-align:middle}
+  .table tr:hover td{background:var(--sunken)}
+  .table tr:last-child td{border-bottom:0}
+  .cell-animal{display:flex;align-items:center;gap:10px}
+  .animal-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--soil-50),var(--soil-500));color:var(--soil-700);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid white;box-shadow:var(--elev-1)}
+  .animal-avatar.goat{background:linear-gradient(135deg,#E8F5E9,#A5D6A7);color:#1b5e20}
+  .animal-avatar.poultry{background:linear-gradient(135deg,#FFF3E0,#FFB74D);color:#E65100}
+  .cell-animal .name{font-weight:500}
+  .cell-animal .sub{font-size:12px;color:var(--text-muted)}
+
+  /* filter bar */
+  .filter-bar{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+  .filter-chip{padding:6px 12px;border-radius:999px;border:1px solid var(--border-strong);background:var(--raised);font-size:13px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:6px}
+  .filter-chip:hover{background:var(--sunken)}
+  .filter-chip.active{background:var(--leaf-600);border-color:var(--leaf-600);color:white}
+  .filter-chip i{width:14px;height:14px}
+
+  /* tabs */
+  .tabs{display:flex;gap:2px;border-bottom:1px solid var(--border-subtle);margin-bottom:16px}
+  .tabs button{background:none;border:0;padding:10px 16px;font-family:inherit;font-size:14px;font-weight:500;color:var(--text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .tabs button.active{color:var(--leaf-600);border-bottom-color:var(--leaf-600);font-weight:600}
+  .tabs button:hover:not(.active){color:var(--text-primary)}
+
+  /* rules */
+  .rule-card{border:1px solid var(--border-subtle);border-radius:12px;background:var(--raised);padding:16px;display:flex;align-items:stretch;gap:12px;margin-bottom:12px;box-shadow:var(--elev-1)}
+  .rule-trigger,.rule-action,.rule-condition{flex:1;padding:12px;border-radius:10px;background:var(--sunken);display:flex;flex-direction:column;gap:4px}
+  .rule-trigger{border-left:3px solid var(--turmeric-500)}
+  .rule-condition{border-left:3px solid var(--info)}
+  .rule-action{border-left:3px solid var(--leaf-600)}
+  .rule-arrow{display:flex;align-items:center;color:var(--text-muted)}
+  .rule-label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:600}
+  .rule-value{font-size:13.5px;color:var(--text-primary);font-weight:500}
+  .rule-toggle{width:36px;height:20px;border-radius:999px;background:var(--leaf-600);position:relative;cursor:pointer}
+  .rule-toggle::after{content:"";position:absolute;top:2px;right:2px;width:16px;height:16px;background:white;border-radius:50%}
+  .rule-toggle.off{background:var(--border-strong)}
+  .rule-toggle.off::after{right:auto;left:2px}
+  .rule-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .rule-name{font-weight:600;font-size:15px}
+
+  /* orders */
+  .order-row{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:14px;align-items:center;padding:14px;border-bottom:1px solid var(--border-subtle)}
+  .order-row:hover{background:var(--sunken)}
+  .order-items{font-size:13px;color:var(--text-secondary)}
+  .order-customer{font-weight:600}
+  .order-total{font-weight:700;font-size:15px;font-family:"JetBrains Mono"}
+  .order-status{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px}
+  .status-packing{background:var(--warning-50);color:#8a5b00}
+  .status-routed{background:var(--info-50);color:var(--info)}
+  .status-delivered{background:var(--success-50);color:var(--success)}
+  .status-new{background:var(--soil-50);color:var(--soil-700)}
+
+  /* storefront */
+  .store-hero{height:420px;border-radius:20px;position:relative;overflow:hidden;margin-bottom:24px;background:linear-gradient(135deg,rgba(31,27,22,.55) 0%,rgba(31,27,22,.1) 50%,transparent 100%),radial-gradient(circle at 80% 20%,rgba(224,164,21,.3),transparent 50%),linear-gradient(180deg,#8FAF6E 0%,#6B8E50 50%,#4E7038 100%);display:flex;align-items:flex-end;padding:40px;color:white}
+  .store-hero-content{position:relative;z-index:2;max-width:520px}
+  .store-eyebrow{display:inline-block;background:rgba(255,255,255,.18);padding:5px 14px;border-radius:999px;font-size:13px;font-weight:500;backdrop-filter:blur(8px);margin-bottom:14px}
+  .store-title{font-family:"Fraunces";font-size:52px;line-height:1.05;font-weight:700;margin-bottom:16px;letter-spacing:-0.02em}
+  .store-subtitle{font-size:17px;opacity:.92;margin-bottom:24px;max-width:440px}
+  .trust-badges{position:absolute;top:28px;right:28px;display:flex;gap:8px;flex-wrap:wrap;max-width:280px;justify-content:flex-end;z-index:2}
+  .trust-badge{background:rgba(255,255,255,.95);color:#1F1B16;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;backdrop-filter:blur(10px)}
+  .trust-badge i{width:14px;height:14px;color:var(--leaf-600)}
+  .product-card{background:var(--raised);border-radius:16px;overflow:hidden;box-shadow:var(--elev-1);transition:all 200ms;cursor:pointer;border:1px solid var(--border-subtle)}
+  .product-card:hover{transform:translateY(-2px);box-shadow:var(--elev-3)}
+  .product-image{height:180px;background:var(--sunken);display:flex;align-items:center;justify-content:center;font-size:60px;position:relative}
+  .product-badge{position:absolute;top:12px;left:12px;background:var(--leaf-600);color:white;font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px}
+  .product-info{padding:16px}
+  .product-name{font-family:"Fraunces";font-size:18px;font-weight:600;margin-bottom:4px}
+  .product-desc{font-size:13px;color:var(--text-secondary);margin-bottom:12px}
+  .product-price{display:flex;align-items:baseline;justify-content:space-between}
+  .price-main{font-size:20px;font-weight:700;font-family:"JetBrains Mono"}
+  .price-unit{font-size:13px;color:var(--text-muted)}
+
+  /* views */
+  .view{display:none;animation:fadeIn 240ms ease}
+  .view.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  /* sensor cards */
+  .sensor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+  .sensor-card{background:var(--raised);border:1px solid var(--border-subtle);border-radius:12px;padding:14px;box-shadow:var(--elev-1);display:flex;flex-direction:column;gap:8px;position:relative}
+  .sensor-head{display:flex;justify-content:space-between;align-items:center}
+  .sensor-name{font-size:13px;font-weight:500;color:var(--text-secondary)}
+  .sensor-status-dot{width:8px;height:8px;border-radius:50%;background:var(--success);animation:pulse 2s ease-in-out infinite}
+  .sensor-status-dot.warn{background:var(--warning);animation:none}
+  .sensor-status-dot.err{background:var(--danger);animation:none}
+  .sensor-value{font-size:22px;font-weight:700;font-family:"JetBrains Mono"}
+  .sensor-unit{font-size:13px;color:var(--text-muted);font-weight:500}
+  .sensor-foot{font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;margin-top:4px}
+
+  /* kanban */
+  .kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .kanban-col{background:var(--sunken);border-radius:12px;padding:12px;min-height:400px}
+  .kanban-col-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:0 4px}
+  .kanban-col-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary)}
+  .kanban-col-count{background:var(--raised);border:1px solid var(--border-subtle);padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+  .kanban-card{background:var(--raised);border:1px solid var(--border-subtle);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:grab;box-shadow:var(--elev-1)}
+  .kanban-card .title{font-size:13.5px;font-weight:500;line-height:1.35;margin-bottom:6px}
+  .kanban-card .meta{font-size:11.5px;color:var(--text-muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .kanban-card .tag{background:var(--sunken);padding:2px 7px;border-radius:999px;font-size:10.5px;font-weight:500}
+
+  /* vet workspace */
+  .vet-layout{display:grid;grid-template-columns:300px 1fr;gap:16px}
+  .vet-patient-list{background:var(--raised);border:1px solid var(--border-subtle);border-radius:12px;padding:10px;height:fit-content}
+  .vet-patient{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;cursor:pointer;border:1px solid transparent}
+  .vet-patient:hover{background:var(--sunken)}
+  .vet-patient.selected{background:var(--leaf-50);border-color:var(--leaf-500)}
+  .prescribe-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .field{display:flex;flex-direction:column;gap:4px}
+  .field label{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em}
+  .field input,.field select,.field textarea{padding:9px 12px;border:1px solid var(--border-strong);border-radius:8px;font-family:inherit;font-size:14px;background:var(--raised);color:var(--text-primary);outline:none}
+  .field input:focus,.field select:focus{border-color:var(--leaf-600);box-shadow:0 0 0 3px rgba(78,158,84,.15)}
+  .autocomp{background:var(--sunken);border-radius:8px;padding:12px;font-size:12.5px;color:var(--text-secondary);border-left:3px solid var(--info)}
+  .autocomp strong{color:var(--text-primary)}
+
+  /* supplier scorecard */
+  .supplier-row{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:14px;align-items:center;padding:14px;border-bottom:1px solid var(--border-subtle)}
+  .score-bar{width:120px;height:6px;background:var(--sunken);border-radius:999px;overflow:hidden;position:relative}
+  .score-fill{height:100%;background:linear-gradient(90deg,var(--leaf-500),var(--leaf-600));border-radius:999px}
+  .score-fill.mid{background:linear-gradient(90deg,var(--warning),var(--turmeric-500))}
+  .score-fill.low{background:linear-gradient(90deg,var(--danger),#8a1515)}
+
+  /* batch trace */
+  .trace-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px;background:var(--sunken);border-radius:10px;font-size:13px}
+  .trace-node{display:flex;align-items:center;gap:6px;background:var(--raised);padding:6px 10px;border-radius:8px;border:1px solid var(--border-subtle);font-weight:500}
+  .trace-arrow{color:var(--text-muted)}
+
+  /* worker app frame */
+  .phone-frame{width:340px;height:700px;background:#1F1B16;border-radius:40px;padding:10px;margin:0 auto;box-shadow:0 20px 50px rgba(0,0,0,.25),0 0 0 2px #2b241c inset;position:relative}
+  .phone-notch{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:110px;height:24px;background:#000;border-radius:20px;z-index:2}
+  .phone-screen{width:100%;height:100%;background:var(--canvas);border-radius:32px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+  .phone-statusbar{display:flex;justify-content:space-between;padding:14px 24px 6px;font-size:12px;font-weight:600}
+  .phone-header{padding:10px 18px;background:linear-gradient(135deg,var(--leaf-600),var(--leaf-500));color:white;display:flex;justify-content:space-between;align-items:center}
+  .phone-body{flex:1;overflow-y:auto;padding:14px}
+  .phone-nav{display:flex;justify-content:space-around;padding:10px;border-top:1px solid var(--border-subtle);background:var(--raised)}
+  .phone-nav a{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--text-muted)}
+  .phone-nav a.active{color:var(--leaf-600);font-weight:600}
+  .phone-nav a i{width:20px;height:20px}
+  .chat-bubble{background:var(--raised);border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:var(--elev-1);max-width:85%}
+  .chat-bubble.user{background:var(--leaf-50);margin-left:auto;border-bottom-right-radius:4px}
+  .chat-bubble.bot{border-bottom-left-radius:4px}
+  .chat-bubble .sender{font-size:11px;color:var(--text-muted);margin-bottom:4px;font-weight:600}
+  .voice-bar{display:flex;align-items:center;gap:8px;background:rgba(78,158,84,.15);padding:8px 12px;border-radius:999px}
+  .voice-viz{display:flex;gap:2px;align-items:center;height:20px}
+  .voice-viz span{width:2px;background:var(--leaf-600);border-radius:2px}
+
+  /* welfare */
+  .welfare-ring{position:relative;width:180px;height:180px;margin:0 auto}
+  .welfare-pct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+  .welfare-pct .big{font-size:38px;font-weight:700;letter-spacing:-0.02em}
+  .welfare-pct .lbl{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+  .badge-mock{background:linear-gradient(135deg,#FFF8E1,#FFECB3);border:2px solid var(--turmeric-500);border-radius:14px;padding:18px;position:relative;display:flex;align-items:center;gap:14px}
+  .badge-seal{width:72px;height:72px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#FFC04D,var(--turmeric-500));display:flex;align-items:center;justify-content:center;color:white;font-family:"Fraunces";font-weight:700;font-size:12px;text-align:center;box-shadow:0 2px 6px rgba(224,164,21,.4);line-height:1.1}
+
+  /* subsidy */
+  .subsidy-row{display:grid;grid-template-columns:1fr auto auto auto;gap:14px;align-items:center;padding:14px;border-bottom:1px solid var(--border-subtle)}
+  .subsidy-name{font-weight:600;font-size:14px}
+  .subsidy-amount{font-family:"JetBrains Mono";font-weight:700;color:var(--leaf-600)}
+  .status-pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}
+  .status-ready{background:var(--success-50);color:var(--success)}
+  .status-pending{background:var(--warning-50);color:#8a5b00}
+  .status-draft{background:var(--sunken);color:var(--text-muted)}
+  .status-submitted{background:var(--info-50);color:var(--info)}
+
+  /* NDVI heatmap */
+  .ndvi-plot{position:relative;height:240px;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,#a0c888,#6a9e5a);display:flex;align-items:center;justify-content:center}
+  .ndvi-plot::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 30% 40%,rgba(224,164,21,.4),transparent 25%),radial-gradient(circle at 70% 60%,rgba(198,40,40,.3),transparent 18%),radial-gradient(circle at 80% 20%,rgba(46,125,50,.4),transparent 22%)}
+  .ndvi-legend{position:absolute;bottom:12px;left:12px;background:rgba(255,255,255,.9);padding:8px 12px;border-radius:8px;font-size:11px;display:flex;gap:10px;align-items:center;backdrop-filter:blur(6px)}
+  .ndvi-scale{width:100px;height:8px;background:linear-gradient(90deg,#C62828,#E0A415,#4E9E54,#2E7D32);border-radius:4px}
+
+  /* field avatar for CRM */
+  .cust-row{display:grid;grid-template-columns:auto 1fr auto auto auto auto;gap:14px;align-items:center;padding:14px;border-bottom:1px solid var(--border-subtle)}
+  .cust-row:hover{background:var(--sunken)}
+
+  /* empty state */
+  .empty{text-align:center;padding:60px 20px;color:var(--text-muted)}
+  .empty i{width:44px;height:44px;margin-bottom:12px;color:var(--border-strong)}
+
+  /* settings */
+  .setting-row{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border-subtle)}
+  .setting-row:last-child{border-bottom:0}
+  .setting-label{font-weight:500}
+  .setting-hint{font-size:12.5px;color:var(--text-muted);margin-top:2px}
+  .integration-card{display:flex;align-items:center;gap:14px;padding:14px;border:1px solid var(--border-subtle);border-radius:12px;margin-bottom:10px}
+  .integration-logo{width:44px;height:44px;border-radius:10px;background:var(--sunken);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:"Fraunces";flex-shrink:0}
+
+  /* scrollbar */
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:10px;border:2px solid var(--canvas)}
+  ::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
+
+  .flex{display:flex}.aic{align-items:center}.jcb{justify-content:space-between}.jcc{justify-content:center}
+  .g4{gap:4px}.g6{gap:6px}.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}
+  .mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb24{margin-bottom:24px}.mt16{margin-top:16px}.mt24{margin-top:24px}
+  .muted{color:var(--text-muted)}.secondary{color:var(--text-secondary)}.w100{width:100%}
+  .f12{font-size:12px}.f13{font-size:13px}.fw6{font-weight:600}.fw7{font-weight:700}
+  .tr{text-align:right}.tc{text-align:center}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark"><i data-lucide="sprout"></i></div>
+      <div class="logo-text">
+        <span class="name">FarmHeaven</span>
+        <span class="sub">Telangana · 72 acres</span>
+      </div>
+    </div>
+
+    <div class="nav">
+      <div class="nav-section">Operate</div>
+      <a data-view="dashboard" class="active"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+      <a data-view="livestock"><i data-lucide="milk"></i>Livestock<span class="count">3</span></a>
+      <a data-view="crops"><i data-lucide="wheat"></i>Crops &amp; Fields</a>
+      <a data-view="iot"><i data-lucide="radio-tower"></i>IoT &amp; Automation</a>
+      <a data-view="inventory"><i data-lucide="package"></i>Inventory</a>
+      <a data-view="tasks"><i data-lucide="clipboard-list"></i>Tasks &amp; People</a>
+      <a data-view="vet"><i data-lucide="stethoscope"></i>Vet Workspace<span class="new">NEW</span></a>
+
+      <div class="nav-section">Sell</div>
+      <a data-view="orders"><i data-lucide="shopping-bag"></i>Orders<span class="count">12</span></a>
+      <a data-view="customers"><i data-lucide="users"></i>Customers</a>
+      <a data-view="storefront"><i data-lucide="store"></i>Storefront</a>
+
+      <div class="nav-section">Analyze</div>
+      <a data-view="finance"><i data-lucide="wallet"></i>Finance</a>
+      <a data-view="welfare"><i data-lucide="leaf"></i>Welfare &amp; Carbon<span class="new">NEW</span></a>
+      <a data-view="reports"><i data-lucide="file-bar-chart"></i>Reports</a>
+
+      <div class="nav-section">Field</div>
+      <a data-view="worker"><i data-lucide="smartphone"></i>Worker App<span class="new">NEW</span></a>
+
+      <div class="nav-section">System</div>
+      <a data-view="settings"><i data-lucide="settings"></i>Settings</a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-avatar">S</div>
+      <div class="user-info">
+        Suprameds
+        <div class="sub">Owner · EN/TE/HI</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <main class="main">
+    <div class="topbar">
+      <div class="search">
+        <i data-lucide="search" style="width:16px;height:16px"></i>
+        <input placeholder="Search animals, fields, SKUs, orders, vendors…" />
+        <span class="kbd">⌘K</span>
+      </div>
+      <div class="lang-toggle">
+        <span class="active">EN</span><span>తె</span><span>हि</span>
+      </div>
+      <div class="weather-chip">
+        <div class="weather-icon"></div><strong>34°C</strong><span class="muted">·</span><span class="muted">Partly cloudy</span>
+      </div>
+      <button class="topbar-action" title="Alerts"><i data-lucide="bell"></i><span class="dot-badge"></span></button>
+      <button class="topbar-action" title="WhatsApp"><i data-lucide="message-circle"></i></button>
+      <button class="topbar-action" title="Help"><i data-lucide="life-buoy"></i></button>
+    </div>
+
+    <div class="content">
+
+      <!-- ===================== DASHBOARD ===================== -->
+      <section class="view active" id="view-dashboard">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Good morning, Suprameds 🌅</div>
+            <div class="page-subtitle">Monday, 20 Apr 2026 · Sunrise 5:58 · Heat index high today — cooling fans armed</div>
+          </div>
+          <div class="flex g8">
+            <button class="btn btn-secondary"><i data-lucide="plus"></i>Quick log</button>
+            <button class="btn btn-primary"><i data-lucide="sparkles"></i>Ask FarmAI</button>
+          </div>
+        </div>
+
+        <div class="alert-banner danger">
+          <i data-lucide="alert-triangle"></i>
+          <div style="flex:1"><div class="title">Cow C-0042 rumination dropped 31% in last 6h</div><div style="font-size:13px">Edge-AI flagged possible acidosis or LDA. Vet task auto-created for Dr. Reddy.</div></div>
+          <button class="btn btn-secondary" style="padding:6px 12px">View animal</button>
+        </div>
+        <div class="alert-banner">
+          <i data-lucide="cloud-rain"></i>
+          <div style="flex:1"><div class="title">Pre-monsoon showers forecast Wed–Fri (78% prob.)</div><div style="font-size:13px">Irrigation zones 2, 4, 7 paused automatically. Compost windrows will be covered.</div></div>
+        </div>
+        <div class="alert-banner info">
+          <i data-lucide="sparkles"></i>
+          <div style="flex:1"><div class="title">Estrus predicted in Parvati (C-0033) — window opens in ~10 hrs</div><div style="font-size:13px">ML model confidence 87% (RFID activity + camera mounting behavior + cycle history). Inseminate between 10 PM tonight and 6 AM tomorrow.</div></div>
+          <button class="btn btn-secondary" style="padding:6px 12px">Schedule AI</button>
+        </div>
+
+        <div class="grid grid-4 mb24">
+          <div class="card metric-card">
+            <div class="auto-tag"><i data-lucide="bot" style="width:11px;height:11px"></i>AUTO</div>
+            <div class="metric-label">Today's milk yield</div>
+            <div class="flex aic" style="gap:6px"><span class="metric-value">486</span><span class="metric-unit">L</span></div>
+            <span class="metric-delta up"><i data-lucide="trending-up" style="width:12px;height:12px"></i>+4.2% vs 7-day</span>
+            <div class="spark-wrap"><canvas id="sp1"></canvas></div>
+          </div>
+          <div class="card metric-card turmeric">
+            <div class="auto-tag"><i data-lucide="bot" style="width:11px;height:11px"></i>AUTO</div>
+            <div class="metric-label">Eggs collected today</div>
+            <div class="flex aic" style="gap:6px"><span class="metric-value">1,248</span><span class="metric-unit">eggs</span></div>
+            <span class="metric-delta up"><i data-lucide="trending-up" style="width:12px;height:12px"></i>+1.8% vs 7-day</span>
+            <div class="spark-wrap"><canvas id="sp2"></canvas></div>
+          </div>
+          <div class="card metric-card soil">
+            <div class="metric-label">Tasks (done / open)</div>
+            <div class="flex aic" style="gap:6px"><span class="metric-value">14<span style="color:var(--text-muted);font-size:22px">/23</span></span></div>
+            <span class="metric-delta up"><i data-lucide="check" style="width:12px;height:12px"></i>60% completion</span>
+            <div class="spark-wrap"><canvas id="sp3"></canvas></div>
+          </div>
+          <div class="card metric-card indigo">
+            <div class="metric-label">Revenue this week</div>
+            <div class="flex aic" style="gap:6px"><span class="metric-value">₹1.12L</span></div>
+            <span class="metric-delta up"><i data-lucide="trending-up" style="width:12px;height:12px"></i>+12.4% WoW</span>
+            <div class="spark-wrap"><canvas id="sp4"></canvas></div>
+          </div>
+        </div>
+
+        <!-- welfare + yield forecast row -->
+        <div class="grid grid-3 mb24">
+          <div class="card metric-card" style="background:linear-gradient(135deg,var(--leaf-50),#F5FBF5);border-color:var(--leaf-500)">
+            <div class="new-tag">NEW</div>
+            <div class="metric-label">Stress-free hours (herd)</div>
+            <div class="flex aic" style="gap:6px"><span class="metric-value" style="color:var(--leaf-600)">94.2</span><span class="metric-unit">% · last 7d</span></div>
+            <div class="muted f12 mt16">Panting 1.8% · crowding 3.2% · vocalization normal</div>
+          </div>
+          <div class="card metric-card">
+            <div class="new-tag">FORECAST</div>
+            <div class="metric-label">Expected 14-day yield</div>
+            <div class="flex aic" style="gap:6px"><span class="metric-value">6,820</span><span class="metric-unit">L milk</span></div>
+            <div class="muted f12 mt16">ML model · ±4% · ties to 34 CSA renewals</div>
+          </div>
+          <div class="card metric-card indigo">
+            <div class="metric-label">Carbon sequestered (YTD)</div>
+            <div class="flex aic" style="gap:6px"><span class="metric-value">2.14</span><span class="metric-unit">tCO₂e</span></div>
+            <div class="muted f12 mt16">Compost + perennials + silvopasture · ~1 car yr offset</div>
+          </div>
+        </div>
+
+        <div class="grid grid-8-4 mb24">
+          <div class="card" style="padding:0">
+            <div style="padding:18px 18px 8px" class="card-header">
+              <div class="card-title">Needs you today</div>
+              <div class="card-action">View all <i data-lucide="arrow-right" style="width:12px;height:12px"></i></div>
+            </div>
+            <div>
+              <div class="task-row"><div class="task-priority high"></div><div class="task-check"></div><div><div class="task-title">Vet visit — Cow C-0042 (possible acidosis)</div><div class="task-meta"><i data-lucide="clock" style="width:12px;height:12px"></i>10:30 AM · Dr. Reddy · Barn A</div></div><button class="btn btn-ghost" style="padding:6px"><i data-lucide="more-horizontal"></i></button></div>
+              <div class="task-row"><div class="task-priority high"></div><div class="task-check"></div><div><div class="task-title">Inseminate Parvati (heat window opens 10 PM)</div><div class="task-meta">AI model 87% confidence · semen straw lot S-8042 (Murrah)</div></div><button class="btn btn-ghost" style="padding:6px"><i data-lucide="more-horizontal"></i></button></div>
+              <div class="task-row"><div class="task-priority med"></div><div class="task-check"></div><div><div class="task-title">Harvest spinach — Plot 3 (window closes today)</div><div class="task-meta"><i data-lucide="user" style="width:12px;height:12px"></i>Ramesh + 2 hands · ~45 kg expected</div></div><button class="btn btn-ghost" style="padding:6px"><i data-lucide="more-horizontal"></i></button></div>
+              <div class="task-row"><div class="task-priority med"></div><div class="task-check done"></div><div><div class="task-title strike">Morning milking — Parlor 1</div><div class="task-meta">Completed 6:12 AM · 241 L · auto-logged via RFID</div></div><button class="btn btn-ghost" style="padding:6px"><i data-lucide="more-horizontal"></i></button></div>
+              <div class="task-row"><div class="task-priority low"></div><div class="task-check"></div><div><div class="task-title">FMD booster — 14 calves in Barn B</div><div class="task-meta"><i data-lucide="syringe" style="width:12px;height:12px"></i>Scheduled 2 PM · Pfizer Raksha lot R-44A</div></div><button class="btn btn-ghost" style="padding:6px"><i data-lucide="more-horizontal"></i></button></div>
+              <div class="task-row"><div class="task-priority high"></div><div class="task-check"></div><div><div class="task-title">Pack subscription boxes — 34 weekly renewals</div><div class="task-meta"><i data-lucide="package" style="width:12px;height:12px"></i>Dispatch cutoff 3 PM · HYD + Sec'bad routes</div></div><button class="btn btn-ghost" style="padding:6px"><i data-lucide="more-horizontal"></i></button></div>
+              <div class="task-row"><div class="task-priority low"></div><div class="task-check"></div><div><div class="task-title">Compost windrow 2 — turn (temp 58°C, optimal)</div><div class="task-meta">Auto-scheduled by temp sensor · 4 PM · est. 20 min</div></div><button class="btn btn-ghost" style="padding:6px"><i data-lucide="more-horizontal"></i></button></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">7-day outlook</div></div>
+            <div class="flex" style="flex-direction:column;gap:10px">
+              <div class="flex aic jcb"><span class="muted">Mon</span><span>🌤 34° / 23°</span><span class="muted">0mm</span></div>
+              <div class="flex aic jcb"><span class="muted">Tue</span><span>🌤 35° / 24°</span><span class="muted">0mm</span></div>
+              <div class="flex aic jcb"><strong>Wed</strong><span>⛈ 31° / 23°</span><span style="color:var(--info);font-weight:600">22mm</span></div>
+              <div class="flex aic jcb"><strong>Thu</strong><span>⛈ 30° / 22°</span><span style="color:var(--info);font-weight:600">34mm</span></div>
+              <div class="flex aic jcb"><strong>Fri</strong><span>🌧 29° / 22°</span><span style="color:var(--info);font-weight:600">18mm</span></div>
+              <div class="flex aic jcb"><span class="muted">Sat</span><span>⛅ 32° / 23°</span><span class="muted">2mm</span></div>
+              <div class="flex aic jcb"><span class="muted">Sun</span><span>☀️ 34° / 23°</span><span class="muted">0mm</span></div>
+            </div>
+            <hr style="border:0;border-top:1px solid var(--border-subtle);margin:14px 0">
+            <div class="secondary" style="font-size:12.5px;line-height:1.5"><strong>Soil temp:</strong> 28.4°C · optimal for transplant<br><strong>Wind:</strong> 14 km/h SW<br><strong>SW monsoon:</strong> arrives ~2 Jun (IMD)</div>
+          </div>
+        </div>
+
+        <div class="grid grid-6-6 mb24">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">Milk yield — last 30 days</div><div class="muted" style="font-size:12px;margin-top:2px">By animal group · litres/day</div></div>
+              <div class="flex g8"><span class="chip" style="background:var(--turmeric-50);color:#8a6008"><span class="chip-dot" style="background:var(--turmeric-500)"></span>Murrah</span><span class="chip healthy"><span class="chip-dot"></span>Gir</span><span class="chip pregnant"><span class="chip-dot"></span>Sahiwal</span></div>
+            </div>
+            <div class="chart-wrap"><canvas id="milkChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">Egg production — by shed</div><div class="muted" style="font-size:12px;margin-top:2px">Eggs/day · last 30 days</div></div></div>
+            <div class="chart-wrap"><canvas id="eggChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:0;overflow:hidden">
+          <div style="padding:18px" class="card-header">
+            <div><div class="card-title">Live farm map</div><div class="muted" style="font-size:12px;margin-top:2px">72 acres · 14 zones · 41 devices online</div></div>
+            <div class="flex g8"><button class="filter-chip active">All</button><button class="filter-chip">Crops</button><button class="filter-chip">Livestock</button><button class="filter-chip">Sensors</button><button class="filter-chip">Irrigation</button></div>
+          </div>
+          <div class="farm-map">
+            <div class="map-zone crop" style="top:12%;left:8%;width:28%;height:32%">Plot 1 · Rice · day 62</div>
+            <div class="map-zone crop" style="top:50%;left:8%;width:24%;height:26%">Plot 3 · Spinach · harvest today</div>
+            <div class="map-zone crop" style="top:12%;left:40%;width:22%;height:22%">Plot 2 · Millets · day 41</div>
+            <div class="map-zone crop" style="top:38%;left:40%;width:22%;height:22%">Plot 4 · Tomato · flowering</div>
+            <div class="map-zone dairy" style="top:64%;left:40%;width:18%;height:20%">Barn A · Dairy · 38</div>
+            <div class="map-zone dairy" style="top:64%;left:60%;width:16%;height:20%">Barn B · Calves · 14</div>
+            <div class="map-zone poultry" style="top:12%;left:66%;width:18%;height:24%">Shed 1 · Layers</div>
+            <div class="map-zone poultry" style="top:40%;left:66%;width:18%;height:20%">Shed 2 · Broilers</div>
+            <div class="map-zone" style="top:80%;left:8%;width:20%;height:14%;background:rgba(91,58,30,.2);border-color:var(--soil-700);color:var(--soil-700)">Compost · 4 windrows</div>
+            <div class="map-pin live" style="background:var(--leaf-600);top:20%;left:18%"><i data-lucide="droplet" style="width:10px;height:10px"></i></div>
+            <div class="map-pin live" style="background:var(--leaf-600);top:60%;left:20%"><i data-lucide="droplet" style="width:10px;height:10px"></i></div>
+            <div class="map-pin" style="background:var(--turmeric-500);top:72%;left:48%"><i data-lucide="video" style="width:10px;height:10px"></i></div>
+            <div class="map-pin" style="background:var(--danger);top:67%;left:55%">!</div>
+            <div class="map-pin live" style="background:var(--indigo-600);top:22%;left:74%"><i data-lucide="video" style="width:10px;height:10px"></i></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== LIVESTOCK ===================== -->
+      <section class="view" id="view-livestock">
+        <div class="page-header">
+          <div><div class="page-title">Livestock · Dairy</div><div class="page-subtitle">38 head · 27 in milk · avg 12.8 L/animal/day</div></div>
+          <div class="flex g8"><button class="btn btn-secondary"><i data-lucide="download"></i>Export</button><button class="btn btn-primary"><i data-lucide="plus"></i>Register animal</button></div>
+        </div>
+
+        <div class="tabs">
+          <button class="active">Dairy (38)</button>
+          <button>Small ruminants (142)</button>
+          <button>Poultry (1,840)</button>
+          <button>Breeding &amp; Estrus</button>
+          <button>Health log</button>
+        </div>
+
+        <!-- Estrus ML prediction (NEW) -->
+        <div class="card mb16" style="background:linear-gradient(135deg,#FFF8E1,#FDF4DC);border-color:var(--turmeric-500);display:flex;align-items:center;gap:16px">
+          <div style="width:52px;height:52px;border-radius:50%;background:var(--turmeric-500);color:white;display:flex;align-items:center;justify-content:center"><i data-lucide="sparkles" style="width:26px;height:26px"></i></div>
+          <div style="flex:1">
+            <div class="flex aic g8"><strong style="font-size:15px">Estrus ML — 2 animals likely in heat within 24h</strong><span class="chip warn"><span class="chip-dot"></span>NEW</span></div>
+            <div class="muted f13" style="margin-top:4px">Parvati (C-0033) window 10 PM → 6 AM · confidence 87% · Tara (C-0055) window 6 AM tomorrow · confidence 72%. Based on RFID pedometer + camera mounting behavior + cycle history. Video clips attached.</div>
+          </div>
+          <button class="btn btn-primary">Schedule AI</button>
+        </div>
+
+        <div class="grid grid-4 mb24">
+          <div class="card"><div class="metric-label">Total head</div><div class="metric-value">38</div><div class="muted" style="font-size:12px;margin-top:6px">Murrah 18 · Gir 12 · Sahiwal 8</div></div>
+          <div class="card"><div class="metric-label">Avg yield</div><div class="flex aic" style="gap:6px"><span class="metric-value">12.8</span><span class="metric-unit">L / day</span></div><div class="muted" style="font-size:12px;margin-top:6px">Best: Lakshmi (18.4 L)</div></div>
+          <div class="card"><div class="metric-label">Pregnant</div><div class="metric-value">9</div><div class="muted" style="font-size:12px;margin-top:6px">Next calving: 14 May</div></div>
+          <div class="card"><div class="metric-label">Open days avg</div><div class="metric-value">94</div><div class="muted" style="font-size:12px;margin-top:6px">Target &lt; 110 · ML-predicted estrus saves 21d/cycle</div></div>
+        </div>
+
+        <div class="filter-bar">
+          <button class="filter-chip active"><i data-lucide="check"></i>All</button>
+          <button class="filter-chip">Murrah</button><button class="filter-chip">Gir</button><button class="filter-chip">Sahiwal</button>
+          <div style="width:1px;height:24px;background:var(--border-subtle);margin:0 6px"></div>
+          <button class="filter-chip">Lactating</button><button class="filter-chip">Pregnant</button><button class="filter-chip">Dry</button><button class="filter-chip">Heifer</button>
+          <div style="margin-left:auto"></div>
+          <button class="filter-chip"><i data-lucide="sliders-horizontal"></i>More</button><button class="filter-chip"><i data-lucide="grid"></i>Grid</button>
+        </div>
+
+        <div class="card" style="padding:0;overflow:hidden">
+          <table class="table">
+            <thead><tr><th>Animal</th><th>Breed</th><th>Status</th><th>Last calving</th><th>DIM</th><th>Yesterday (L)</th><th>Lactation vs avg</th><th>Est. heat</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><div class="cell-animal"><div class="animal-avatar">L</div><div><div class="name">Lakshmi</div><div class="sub mono">C-0042 · 6 yr</div></div></div></td><td>Murrah</td><td><span class="chip sick"><span class="chip-dot"></span>Sick</span></td><td>12 Jan 2026</td><td>98</td><td><strong>18.4</strong></td><td style="color:var(--danger)">▼ -21%</td><td class="muted">—</td><td><button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button></td></tr>
+              <tr><td><div class="cell-animal"><div class="animal-avatar">G</div><div><div class="name">Ganga</div><div class="sub mono">C-0039 · 5 yr</div></div></div></td><td>Gir</td><td><span class="chip healthy"><span class="chip-dot"></span>Healthy</span></td><td>28 Feb 2026</td><td>51</td><td><strong>14.2</strong></td><td style="color:var(--success)">▲ +8%</td><td class="muted">5 May ±1d</td><td><button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button></td></tr>
+              <tr><td><div class="cell-animal"><div class="animal-avatar">N</div><div><div class="name">Nandini</div><div class="sub mono">C-0051 · 4 yr</div></div></div></td><td>Sahiwal</td><td><span class="chip pregnant"><span class="chip-dot"></span>Pregnant</span></td><td>05 Aug 2025</td><td>—</td><td>—</td><td class="muted">Due 14 May</td><td class="muted">—</td><td><button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button></td></tr>
+              <tr style="background:var(--warning-50)"><td><div class="cell-animal"><div class="animal-avatar">P</div><div><div class="name">Parvati</div><div class="sub mono">C-0033 · 7 yr</div></div></div></td><td>Murrah</td><td><span class="chip heat"><span class="chip-dot"></span>In heat</span></td><td>22 Dec 2025</td><td>119</td><td><strong>15.1</strong></td><td style="color:var(--success)">▲ +3%</td><td style="color:var(--turmeric-500);font-weight:600">NOW · 10 PM</td><td><button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button></td></tr>
+              <tr><td><div class="cell-animal"><div class="animal-avatar">K</div><div><div class="name">Kamala</div><div class="sub mono">C-0047 · 5 yr</div></div></div></td><td>Gir</td><td><span class="chip healthy"><span class="chip-dot"></span>Healthy</span></td><td>14 Mar 2026</td><td>37</td><td><strong>11.8</strong></td><td style="color:var(--success)">▲ +2%</td><td class="muted">—</td><td><button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button></td></tr>
+              <tr><td><div class="cell-animal"><div class="animal-avatar">T</div><div><div class="name">Tara</div><div class="sub mono">C-0055 · 4 yr</div></div></div></td><td>Murrah</td><td><span class="chip healthy"><span class="chip-dot"></span>Healthy</span></td><td>02 Jan 2026</td><td>108</td><td><strong>13.6</strong></td><td style="color:var(--success)">▲ +1%</td><td style="color:var(--turmeric-500);font-weight:600">~24h</td><td><button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button></td></tr>
+              <tr><td><div class="cell-animal"><div class="animal-avatar">R</div><div><div class="name">Radha</div><div class="sub mono">C-0056 · 3 yr</div></div></div></td><td>Sahiwal</td><td><span class="chip weaning"><span class="chip-dot"></span>Heifer</span></td><td>—</td><td>—</td><td>—</td><td class="muted">First service due</td><td class="muted">—</td><td><button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button></td></tr>
+              <tr><td><div class="cell-animal"><div class="animal-avatar">S</div><div><div class="name">Sita</div><div class="sub mono">C-0029 · 8 yr</div></div></div></td><td>Murrah</td><td><span class="chip healthy"><span class="chip-dot"></span>Healthy</span></td><td>08 Feb 2026</td><td>71</td><td><strong>16.7</strong></td><td style="color:var(--success)">▲ +11%</td><td class="muted">—</td><td><button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================== CROPS & FIELDS ===================== -->
+      <section class="view" id="view-crops">
+        <div class="page-header">
+          <div><div class="page-title">Crops &amp; Fields</div><div class="page-subtitle">14 plots · 54 active acres · 4 crops in season · 100% PGS-India compliant inputs YTD</div></div>
+          <div class="flex g8"><button class="btn btn-secondary"><i data-lucide="upload"></i>Upload drone orthomosaic</button><button class="btn btn-primary"><i data-lucide="plus"></i>New plot</button></div>
+        </div>
+
+        <div class="tabs">
+          <button class="active">Plots (14)</button>
+          <button>Rotation planner</button>
+          <button>Soil lab</button>
+          <button>NDVI &amp; drone</button>
+          <button>Compost pipeline</button>
+          <button>IPM log</button>
+        </div>
+
+        <div class="grid grid-4 mb24">
+          <div class="card metric-card"><div class="metric-label">Active plots</div><div class="metric-value">14</div><div class="muted f12 mt16">54 / 72 acres · rest fallow + silvopasture</div></div>
+          <div class="card metric-card turmeric"><div class="metric-label">14-day yield forecast</div><div class="flex aic" style="gap:6px"><span class="metric-value">1,240</span><span class="metric-unit">kg</span></div><div class="muted f12 mt16">ML · weather × soil × history · 34 CSA boxes committed</div></div>
+          <div class="card metric-card soil"><div class="metric-label">Compost ready</div><div class="flex aic" style="gap:6px"><span class="metric-value">2.1</span><span class="metric-unit">tonnes</span></div><div class="muted f12 mt16">Windrow 1 cured · apply to Plot 4 Wed</div></div>
+          <div class="card metric-card"><div class="metric-label">Organic cert</div><div class="flex aic g6"><span class="metric-value" style="color:var(--leaf-600)">PGS</span></div><div class="muted f12 mt16">100% compliance YTD · next audit 12 Jul 2026</div></div>
+        </div>
+
+        <div class="grid grid-7-5 mb24">
+          <div class="card" style="padding:0;overflow:hidden">
+            <div style="padding:18px" class="card-header"><div class="card-title">Plot map · current season</div><div class="card-action">Satellite layer <i data-lucide="arrow-right" style="width:12px;height:12px"></i></div></div>
+            <div class="farm-map" style="height:280px;border-radius:0;border-top:1px solid var(--border-subtle)">
+              <div class="map-zone crop" style="top:10%;left:5%;width:26%;height:28%">Plot 1 · Rice · 62d · 420kg forecast</div>
+              <div class="map-zone crop" style="top:44%;left:5%;width:22%;height:24%">Plot 3 · Spinach · harvest</div>
+              <div class="map-zone crop" style="top:10%;left:36%;width:20%;height:22%">Plot 2 · Millets · 41d</div>
+              <div class="map-zone crop" style="top:36%;left:36%;width:20%;height:22%">Plot 4 · Tomato · fl</div>
+              <div class="map-zone crop" style="top:64%;left:36%;width:20%;height:18%">Plot 5 · Moringa</div>
+              <div class="map-zone crop" style="top:10%;left:60%;width:22%;height:28%">Plot 6 · Pulses · 14d</div>
+              <div class="map-zone" style="top:44%;left:60%;width:22%;height:20%;background:rgba(91,58,30,.2);border-color:var(--soil-700);color:var(--soil-700)">Compost yard · 4 windrows</div>
+              <div class="map-zone crop" style="top:68%;left:60%;width:22%;height:14%">Plot 7 · Fallow + legume cover</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Soil lab results <span class="new-tag" style="position:static;margin-left:8px">NEW</span></div>
+              <div class="card-action">View all <i data-lucide="arrow-right" style="width:12px;height:12px"></i></div>
+            </div>
+            <div class="muted f12 mb12">Last sample: Anand AU · 12 Apr 2026 · Plot 4</div>
+            <div class="flex aic jcb mb8"><span class="f13 muted">Organic carbon</span><strong>0.82%</strong></div>
+            <div class="score-bar mb12"><div class="score-fill" style="width:62%"></div></div>
+            <div class="flex aic jcb mb8"><span class="f13 muted">pH</span><strong>6.8</strong></div>
+            <div class="score-bar mb12"><div class="score-fill" style="width:85%"></div></div>
+            <div class="flex aic jcb mb8"><span class="f13 muted">Available N</span><strong>186 kg/ha</strong></div>
+            <div class="score-bar mb12"><div class="score-fill mid" style="width:55%"></div></div>
+            <div class="flex aic jcb mb8"><span class="f13 muted">Microbial biomass</span><strong>412 μg C/g</strong></div>
+            <div class="score-bar mb12"><div class="score-fill" style="width:78%"></div></div>
+            <hr style="border:0;border-top:1px solid var(--border-subtle);margin:10px 0">
+            <button class="btn btn-secondary w100"><i data-lucide="send"></i>Mail next sample kit</button>
+          </div>
+        </div>
+
+        <div class="card mb24">
+          <div class="card-header">
+            <div><div class="card-title">Drone NDVI — latest flight <span class="new-tag" style="position:static;margin-left:8px">NEW</span></div><div class="muted f12">Redwing Robotics · 18 Apr 2026 · 08:14 IST · ₹25/acre</div></div>
+            <div class="flex g8"><button class="filter-chip active">NDVI</button><button class="filter-chip">True color</button><button class="filter-chip">Thermal</button></div>
+          </div>
+          <div class="ndvi-plot">
+            <div class="ndvi-legend">
+              <span class="muted">Stressed</span><div class="ndvi-scale"></div><span class="muted">Healthy</span>
+            </div>
+          </div>
+          <div class="flex aic g12 mt16">
+            <span class="chip sick"><span class="chip-dot"></span>Plot 4 NW corner — stress detected (NDVI 0.41)</span>
+            <span class="chip healthy"><span class="chip-dot"></span>Plot 1 — peak canopy (NDVI 0.78)</span>
+          </div>
+        </div>
+
+        <div class="card" style="padding:0;overflow:hidden">
+          <table class="table">
+            <thead><tr><th>Plot</th><th>Crop</th><th>Stage</th><th>Days in</th><th>Area</th><th>Yield forecast (14d)</th><th>Next action</th><th></th></tr></thead>
+            <tbody>
+              <tr><td class="fw6">Plot 1</td><td>Basmati rice</td><td><span class="chip info"><span class="chip-dot"></span>Vegetative</span></td><td>62</td><td>8 acres</td><td class="fw6">420 kg</td><td>Nitrogen top-dress (Wed)</td><td><button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button></td></tr>
+              <tr><td class="fw6">Plot 2</td><td>Little millet</td><td><span class="chip info"><span class="chip-dot"></span>Tillering</span></td><td>41</td><td>5 acres</td><td class="fw6">180 kg</td><td>IPM scout</td><td><button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button></td></tr>
+              <tr style="background:var(--warning-50)"><td class="fw6">Plot 3</td><td>Palak (spinach)</td><td><span class="chip heat"><span class="chip-dot"></span>Harvest</span></td><td>28</td><td>2 acres</td><td class="fw6">45 kg today</td><td>Harvest 6:30 AM · dispatch 3 PM</td><td><button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button></td></tr>
+              <tr><td class="fw6">Plot 4</td><td>Tomato (heirloom)</td><td><span class="chip healthy"><span class="chip-dot"></span>Flowering</span></td><td>51</td><td>4 acres</td><td class="fw6">280 kg</td><td>Drip on · compost apply Wed</td><td><button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button></td></tr>
+              <tr><td class="fw6">Plot 5</td><td>Moringa</td><td><span class="chip cert"><span class="chip-dot"></span>Perennial</span></td><td>820</td><td>3 acres</td><td class="fw6">62 kg/wk</td><td>Prune Q3</td><td><button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button></td></tr>
+              <tr><td class="fw6">Plot 6</td><td>Red gram (tur)</td><td><span class="chip info"><span class="chip-dot"></span>Germination</span></td><td>14</td><td>7 acres</td><td class="fw6">— (4 mo)</td><td>Thin + mulch</td><td><button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button></td></tr>
+              <tr><td class="fw6">Plot 7</td><td>Sunn hemp (cover)</td><td><span class="chip weaning"><span class="chip-dot"></span>Fallow+cover</span></td><td>—</td><td>6 acres</td><td class="muted">Green manure</td><td>Incorporate before kharif</td><td><button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================== IOT ===================== -->
+      <section class="view" id="view-iot">
+        <div class="page-header">
+          <div><div class="page-title">IoT &amp; Automation</div><div class="page-subtitle">41 of 43 devices online · 12 active rules · ₹18,400 estimated water saved this month</div></div>
+          <div class="flex g8"><button class="btn btn-secondary"><i data-lucide="radio-tower"></i>Devices</button><button class="btn btn-primary"><i data-lucide="plus"></i>New rule</button></div>
+        </div>
+
+        <h3 class="mb12" style="color:var(--text-secondary);font-size:13px;text-transform:uppercase;letter-spacing:.06em">Live sensors</h3>
+        <div class="sensor-grid mb24">
+          <div class="sensor-card"><div class="sensor-head"><div class="sensor-name">Plot 4 · Soil moisture</div><div class="sensor-status-dot"></div></div><div><span class="sensor-value">32.4</span> <span class="sensor-unit">% VWC</span></div><div class="sensor-chart-wrap"><canvas></canvas></div><div class="sensor-foot"><span>optimal 25–35%</span><span>12s ago</span></div></div>
+          <div class="sensor-card"><div class="sensor-head"><div class="sensor-name">Barn A · Temperature</div><div class="sensor-status-dot warn"></div></div><div><span class="sensor-value">32.1</span> <span class="sensor-unit">°C</span></div><div class="sensor-chart-wrap"><canvas></canvas></div><div class="sensor-foot"><span style="color:var(--warning)">near fan threshold</span><span>4s ago</span></div></div>
+          <div class="sensor-card"><div class="sensor-head"><div class="sensor-name">Water tank 1 · Level</div><div class="sensor-status-dot"></div></div><div><span class="sensor-value">68</span> <span class="sensor-unit">%</span></div><div class="sensor-chart-wrap"><canvas></canvas></div><div class="sensor-foot"><span>~6,800 L</span><span>21s ago</span></div></div>
+          <div class="sensor-card"><div class="sensor-head"><div class="sensor-name">Shed 1 · NH3</div><div class="sensor-status-dot"></div></div><div><span class="sensor-value">8.4</span> <span class="sensor-unit">ppm</span></div><div class="sensor-chart-wrap"><canvas></canvas></div><div class="sensor-foot"><span>safe &lt; 25</span><span>30s ago</span></div></div>
+          <div class="sensor-card"><div class="sensor-head"><div class="sensor-name">Compost W2 · Core temp</div><div class="sensor-status-dot"></div></div><div><span class="sensor-value">58</span> <span class="sensor-unit">°C</span></div><div class="sensor-chart-wrap"><canvas></canvas></div><div class="sensor-foot"><span>thermophilic</span><span>1m ago</span></div></div>
+          <div class="sensor-card"><div class="sensor-head"><div class="sensor-name">Parlor 1 · Flow</div><div class="sensor-status-dot"></div></div><div><span class="sensor-value">241</span> <span class="sensor-unit">L today</span></div><div class="sensor-chart-wrap"><canvas></canvas></div><div class="sensor-foot"><span>RFID auto-assign</span><span>live</span></div></div>
+          <div class="sensor-card"><div class="sensor-head"><div class="sensor-name">Plot 4 · ET (Arable)</div><div class="sensor-status-dot"></div></div><div><span class="sensor-value">4.2</span> <span class="sensor-unit">mm/d</span></div><div class="sensor-chart-wrap"><canvas></canvas></div><div class="sensor-foot"><span>irrigation basis</span><span>live</span></div></div>
+          <div class="sensor-card"><div class="sensor-head"><div class="sensor-name">Gate camera · Motion</div><div class="sensor-status-dot err"></div></div><div><span class="sensor-value" style="color:var(--danger)">OFFLINE</span></div><div class="sensor-foot"><span style="color:var(--danger)">last heard 2h</span><span><u style="cursor:pointer">reboot</u></span></div></div>
+        </div>
+
+        <h3 class="mb12" style="color:var(--text-secondary);font-size:13px;text-transform:uppercase;letter-spacing:.06em">Active rules (12)</h3>
+
+        <div class="rule-card"><div style="flex:1"><div class="rule-head"><div class="rule-name">🌱 Smart irrigation · Plot 4 (tomato)</div><div class="flex aic g8"><span class="muted f12">Triggered 18× this month</span><div class="rule-toggle"></div></div></div><div class="flex g12"><div class="rule-trigger"><div class="rule-label">When</div><div class="rule-value">Soil moisture &lt; 18% VWC</div></div><div class="rule-arrow"><i data-lucide="chevron-right"></i></div><div class="rule-condition"><div class="rule-label">And</div><div class="rule-value">No rain forecast 24h · ET &gt; 3mm</div></div><div class="rule-arrow"><i data-lucide="chevron-right"></i></div><div class="rule-action"><div class="rule-label">Then</div><div class="rule-value">Open valve zone 4 · 30min · WhatsApp Ramesh</div></div></div></div></div>
+
+        <div class="rule-card"><div style="flex:1"><div class="rule-head"><div class="rule-name">🐄 Rumination drop · disease early-warning</div><div class="flex aic g8"><span class="muted f12">Caught 4 cases this year</span><div class="rule-toggle"></div></div></div><div class="flex g12"><div class="rule-trigger"><div class="rule-label">When</div><div class="rule-value">Rumination ↓ &gt;25% in 6h</div></div><div class="rule-arrow"><i data-lucide="chevron-right"></i></div><div class="rule-action"><div class="rule-label">Then</div><div class="rule-value">Create vet task · flag animal · notify owner</div></div></div></div></div>
+
+        <div class="rule-card"><div style="flex:1"><div class="rule-head"><div class="rule-name">💊 Milk withdrawal auto-quarantine</div><div class="flex aic g8"><span class="muted f12">Keeps PGS cert clean</span><div class="rule-toggle"></div></div></div><div class="flex g12"><div class="rule-trigger"><div class="rule-label">When</div><div class="rule-value">Antibiotic logged on any animal</div></div><div class="rule-arrow"><i data-lucide="chevron-right"></i></div><div class="rule-action"><div class="rule-label">Then</div><div class="rule-value">Hide her milk from dispatch until expiry · divert to compost</div></div></div></div></div>
+
+        <div class="rule-card"><div style="flex:1"><div class="rule-head"><div class="rule-name">🔥 Shed heat-stress protection</div><div class="flex aic g8"><span class="muted f12">Est. 14 birds/yr saved</span><div class="rule-toggle"></div></div></div><div class="flex g12"><div class="rule-trigger"><div class="rule-label">When</div><div class="rule-value">Shed temp &gt; 34°C for 10 min</div></div><div class="rule-arrow"><i data-lucide="chevron-right"></i></div><div class="rule-action"><div class="rule-label">Then</div><div class="rule-value">Fans full · misters 3 min · SMS if unresolved 15min</div></div></div></div></div>
+
+        <div class="rule-card"><div style="flex:1"><div class="rule-head"><div class="rule-name">✨ Estrus ML detection &amp; AI scheduling</div><div class="flex aic g8"><span class="muted f12">NEW · +5–10% conception</span><div class="rule-toggle"></div></div></div><div class="flex g12"><div class="rule-trigger"><div class="rule-label">When</div><div class="rule-value">Activity spike + mounting + cycle match</div></div><div class="rule-arrow"><i data-lucide="chevron-right"></i></div><div class="rule-action"><div class="rule-label">Then</div><div class="rule-value">Create AI task in optimal window · attach video clip · notify vet</div></div></div></div></div>
+
+        <div class="rule-card"><div style="flex:1"><div class="rule-head"><div class="rule-name">🦊 Predator detection · night cam</div><div class="flex aic g8"><span class="muted f12">2 jackal events blocked</span><div class="rule-toggle off"></div></div></div><div class="flex g12"><div class="rule-trigger"><div class="rule-label">When</div><div class="rule-value">Edge-AI detects non-farm animal 10pm–5am</div></div><div class="rule-arrow"><i data-lucide="chevron-right"></i></div><div class="rule-action"><div class="rule-label">Then</div><div class="rule-value">Siren 20s · call owner · log clip</div></div></div></div></div>
+      </section>
+
+      <!-- ===================== INVENTORY ===================== -->
+      <section class="view" id="view-inventory">
+        <div class="page-header">
+          <div><div class="page-title">Inventory</div><div class="page-subtitle">284 SKUs · ₹8.4L tied up · 3 expiring this week · 2 withdrawal-quarantined</div></div>
+          <div class="flex g8"><button class="btn btn-secondary"><i data-lucide="scan-line"></i>OCR bill</button><button class="btn btn-primary"><i data-lucide="plus"></i>New SKU</button></div>
+        </div>
+
+        <div class="tabs">
+          <button class="active">Feed &amp; fodder</button>
+          <button>Seeds</button>
+          <button>Medicines &amp; vaccines</button>
+          <button>Harvested produce</button>
+          <button>Packaging</button>
+          <button>Suppliers <span style="background:var(--turmeric-500);color:#1F1B16;font-size:9px;padding:1px 5px;border-radius:4px;margin-left:4px">NEW</span></button>
+          <button>Batch lineage <span style="background:var(--turmeric-500);color:#1F1B16;font-size:9px;padding:1px 5px;border-radius:4px;margin-left:4px">NEW</span></button>
+        </div>
+
+        <div class="grid grid-4 mb24">
+          <div class="card metric-card"><div class="metric-label">On hand (feed)</div><div class="flex aic" style="gap:6px"><span class="metric-value">1,240</span><span class="metric-unit">kg</span></div><div class="muted f12 mt16">12 days runway · reorder 2 May</div></div>
+          <div class="card metric-card danger"><div class="metric-label">Withdrawal quarantine</div><div class="flex aic" style="gap:6px"><span class="metric-value">14</span><span class="metric-unit">L milk</span></div><div class="muted f12 mt16">Lakshmi antibiotic · clears 24 Apr</div></div>
+          <div class="card metric-card turmeric"><div class="metric-label">Expiring in 7 days</div><div class="metric-value">3</div><div class="muted f12 mt16">FMD vax · Lactoferm 45g · Pyrethrin</div></div>
+          <div class="card metric-card"><div class="metric-label">100% organic inputs</div><div class="metric-value" style="color:var(--leaf-600)">✓</div><div class="muted f12 mt16">0 non-PGS purchases YTD</div></div>
+        </div>
+
+        <!-- Supplier scorecard -->
+        <div class="card mb24" style="padding:0;overflow:hidden">
+          <div style="padding:18px" class="card-header">
+            <div><div class="card-title">Supplier scorecard <span class="new-tag" style="position:static;margin-left:8px">NEW</span></div><div class="muted f12 mt16" style="margin-top:4px">Locked down after last PGS audit: every vendor must have current cert on file</div></div>
+            <button class="btn btn-secondary"><i data-lucide="plus"></i>Onboard supplier</button>
+          </div>
+          <div>
+            <div class="supplier-row" style="border-top:1px solid var(--border-subtle)">
+              <div class="animal-avatar" style="background:var(--leaf-50);color:var(--leaf-600)">AO</div>
+              <div><div class="fw6">Andhra Organics Pvt Ltd</div><div class="muted f12">Feed · compound cattle feed · NPOP Zone-2</div></div>
+              <span class="chip cert"><span class="chip-dot"></span>NPOP valid · exp 14 Oct 26</span>
+              <div class="flex aic g8"><div class="score-bar"><div class="score-fill" style="width:94%"></div></div><strong>94</strong></div>
+              <button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button>
+            </div>
+            <div class="supplier-row">
+              <div class="animal-avatar" style="background:var(--turmeric-50);color:#8a6008">GV</div>
+              <div><div class="fw6">Green Valley Seeds</div><div class="muted f12">Seeds · tomato, palak, millets · NPOP</div></div>
+              <span class="chip cert"><span class="chip-dot"></span>NPOP valid</span>
+              <div class="flex aic g8"><div class="score-bar"><div class="score-fill" style="width:88%"></div></div><strong>88</strong></div>
+              <button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button>
+            </div>
+            <div class="supplier-row">
+              <div class="animal-avatar" style="background:var(--indigo-50);color:var(--indigo-600)">DH</div>
+              <div><div class="fw6">DeHaat (bulk inputs)</div><div class="muted f12">Mixed organic inputs · API integrated</div></div>
+              <span class="chip cert"><span class="chip-dot"></span>Aggregator · per-batch cert</span>
+              <div class="flex aic g8"><div class="score-bar"><div class="score-fill" style="width:81%"></div></div><strong>81</strong></div>
+              <button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button>
+            </div>
+            <div class="supplier-row" style="background:var(--warning-50)">
+              <div class="animal-avatar" style="background:var(--danger-50);color:var(--danger)">KV</div>
+              <div><div class="fw6">Krishna Veterinary Supply</div><div class="muted f12">Medicines · cert expires in 24 days</div></div>
+              <span class="chip warn"><span class="chip-dot"></span>Cert renewal due</span>
+              <div class="flex aic g8"><div class="score-bar"><div class="score-fill mid" style="width:62%"></div></div><strong>62</strong></div>
+              <button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Batch lineage -->
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Batch lineage preview <span class="new-tag" style="position:static;margin-left:8px">NEW</span></div><div class="muted f12" style="margin-top:4px">Scan any pack QR → see every input that touched it</div></div><button class="btn btn-secondary"><i data-lucide="qr-code"></i>Scan a pack</button></div>
+          <div class="muted f12 mb8">Tracing: A2 Ghee 500ml · batch #GHI-0412</div>
+          <div class="trace-flow mb16">
+            <span class="trace-node"><i data-lucide="store" style="width:14px;height:14px"></i> Andhra Organics · feed lot F-4421</span>
+            <span class="trace-arrow">→</span>
+            <span class="trace-node"><i data-lucide="milk" style="width:14px;height:14px"></i> Ganga + 11 Gir cows</span>
+            <span class="trace-arrow">→</span>
+            <span class="trace-node"><i data-lucide="droplet" style="width:14px;height:14px"></i> Parlor 1 · batch M-0412</span>
+            <span class="trace-arrow">→</span>
+            <span class="trace-node"><i data-lucide="package-2" style="width:14px;height:14px"></i> Bilona churn · 14 Apr</span>
+            <span class="trace-arrow">→</span>
+            <span class="trace-node"><i data-lucide="package" style="width:14px;height:14px"></i> Packed · Meena</span>
+            <span class="trace-arrow">→</span>
+            <span class="trace-node"><i data-lucide="qr-code" style="width:14px;height:14px"></i> GHI-0412</span>
+          </div>
+          <div class="flex g8"><span class="chip cert"><span class="chip-dot"></span>100% PGS inputs</span><span class="chip healthy"><span class="chip-dot"></span>No antibiotic within 90d</span><span class="chip info"><span class="chip-dot"></span>4 animals, 1 farm, 0 co-mingling</span></div>
+        </div>
+      </section>
+
+      <!-- ===================== TASKS & PEOPLE ===================== -->
+      <section class="view" id="view-tasks">
+        <div class="page-header">
+          <div><div class="page-title">Tasks &amp; People</div><div class="page-subtitle">23 open tasks · 8 workers on shift · payroll due 30 Apr</div></div>
+          <div class="flex g8"><button class="btn btn-secondary"><i data-lucide="calendar"></i>Shift planner</button><button class="btn btn-primary"><i data-lucide="plus"></i>New task</button></div>
+        </div>
+
+        <div class="tabs">
+          <button class="active">Kanban</button>
+          <button>People roster</button>
+          <button>Attendance</button>
+          <button>Payroll &amp; ESIC</button>
+        </div>
+
+        <div class="kanban mb24">
+          <div class="kanban-col">
+            <div class="kanban-col-head"><span class="kanban-col-title">Backlog</span><span class="kanban-col-count">7</span></div>
+            <div class="kanban-card"><div class="title">Clean drip lines · Plot 4</div><div class="meta"><span class="tag">Ramesh</span><span>Due Sat</span></div></div>
+            <div class="kanban-card"><div class="title">Kadaknath breeding stock selection</div><div class="meta"><span class="tag">Vet</span><span>Next week</span></div></div>
+            <div class="kanban-card"><div class="title">Renew PGS-India cert docs</div><div class="meta"><span class="tag">Owner</span><span>By Jul</span></div></div>
+            <div class="kanban-card"><div class="title">Buy 40kg mineral mix</div><div class="meta"><span class="tag">Low stock</span></div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-head"><span class="kanban-col-title">Today</span><span class="kanban-col-count">9</span></div>
+            <div class="kanban-card" style="border-left:3px solid var(--danger)"><div class="title">Vet visit · Cow C-0042</div><div class="meta"><span class="tag">Dr Reddy</span><span>10:30 AM</span></div></div>
+            <div class="kanban-card" style="border-left:3px solid var(--turmeric-500)"><div class="title">Harvest Plot 3 · spinach</div><div class="meta"><span class="tag">Ramesh+2</span><span>~45 kg</span></div></div>
+            <div class="kanban-card"><div class="title">FMD booster · 14 calves</div><div class="meta"><span class="tag">Lakshmi (worker)</span><span>2 PM</span></div></div>
+            <div class="kanban-card"><div class="title">Pack 34 CSA boxes</div><div class="meta"><span class="tag">Meena</span><span>Cutoff 3 PM</span></div></div>
+            <div class="kanban-card"><div class="title">Compost W2 · turn</div><div class="meta"><span class="tag">Auto</span></div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-head"><span class="kanban-col-title">In progress</span><span class="kanban-col-count">3</span></div>
+            <div class="kanban-card"><div class="title">Morning milking · Parlor 1</div><div class="meta"><span class="tag">Auto</span><span>83%</span></div></div>
+            <div class="kanban-card"><div class="title">Drip zone 4 · watering</div><div class="meta"><span class="tag">Auto</span><span>12/30 min</span></div></div>
+            <div class="kanban-card"><div class="title">Lab sample prep · Plot 4</div><div class="meta"><span class="tag">Owner</span></div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-head"><span class="kanban-col-title">Done today</span><span class="kanban-col-count">14</span></div>
+            <div class="kanban-card"><div class="title" style="color:var(--text-muted)">✓ Egg belt collection</div><div class="meta">1,248 eggs · auto</div></div>
+            <div class="kanban-card"><div class="title" style="color:var(--text-muted)">✓ Morning milking</div><div class="meta">241 L · 6:12 AM</div></div>
+            <div class="kanban-card"><div class="title" style="color:var(--text-muted)">✓ Gate check-in · 8 workers</div><div class="meta">Geo-fenced</div></div>
+          </div>
+        </div>
+
+        <!-- Payroll section -->
+        <div class="card" style="padding:0;overflow:hidden">
+          <div style="padding:18px" class="card-header">
+            <div><div class="card-title">Payroll &amp; statutory (Apr 2026) <span class="new-tag" style="position:static;margin-left:8px">NEW</span></div><div class="muted f12" style="margin-top:4px">Auto-calculates PF 12% · ESIC 3.25% · gratuity accrual · Telugu payslip via WhatsApp</div></div>
+            <button class="btn btn-primary"><i data-lucide="send"></i>Run payroll (₹84,320)</button>
+          </div>
+          <table class="table">
+            <thead><tr><th>Worker</th><th>Role</th><th>Days</th><th>Wage rate</th><th>Gross</th><th>PF 12%</th><th>ESIC</th><th>Net payout</th></tr></thead>
+            <tbody>
+              <tr><td><div class="cell-animal"><div class="animal-avatar" style="background:var(--leaf-50);color:var(--leaf-600)">RA</div><div><div class="name">Ramesh Anand</div><div class="sub muted">Field lead</div></div></div></td><td>Supervisor</td><td>26</td><td class="mono">₹650/d</td><td class="mono">₹16,900</td><td class="mono">₹2,028</td><td class="mono">₹549</td><td class="mono fw7">₹14,323</td></tr>
+              <tr><td><div class="cell-animal"><div class="animal-avatar" style="background:var(--turmeric-50);color:#8a6008">ME</div><div><div class="name">Meena Devi</div><div class="sub muted">Packer</div></div></div></td><td>Dispatch</td><td>24</td><td class="mono">₹450/d</td><td class="mono">₹10,800</td><td class="mono">₹1,296</td><td class="mono">₹351</td><td class="mono fw7">₹9,153</td></tr>
+              <tr><td><div class="cell-animal"><div class="animal-avatar" style="background:var(--indigo-50);color:var(--indigo-600)">LA</div><div><div class="name">Lakshmi Reddy</div><div class="sub muted">Dairy hand</div></div></div></td><td>Dairy</td><td>26</td><td class="mono">₹500/d</td><td class="mono">₹13,000</td><td class="mono">₹1,560</td><td class="mono">₹423</td><td class="mono fw7">₹11,017</td></tr>
+              <tr><td colspan="4" class="tr fw6 muted">Totals (8 workers)</td><td class="mono fw7">₹98,450</td><td class="mono">₹11,814</td><td class="mono">₹3,200</td><td class="mono fw7" style="color:var(--leaf-600)">₹84,320</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================== VET WORKSPACE (NEW) ===================== -->
+      <section class="view" id="view-vet">
+        <div class="page-header">
+          <div><div class="page-title">Vet Workspace <span class="new-tag" style="position:static;margin-left:8px">NEW</span></div><div class="page-subtitle">Scoped portal for Dr. Reddy · CDSCO drug database · auto-dose by breed/weight · withdrawal tracking locked in</div></div>
+          <div class="flex g8"><button class="btn btn-secondary"><i data-lucide="history"></i>Prescription history</button><button class="btn btn-primary"><i data-lucide="file-plus"></i>New prescription</button></div>
+        </div>
+
+        <div class="alert-banner info">
+          <i data-lucide="info"></i>
+          <div style="flex:1"><div class="title">External user mode · Dr. N. Reddy (BVSc, reg. APVC-14028) signed in</div><div class="f13">Read livestock + health timeline · write prescriptions + treatments. All other modules hidden. Actions sync to owner's dashboard + Inventory withdrawal.</div></div>
+        </div>
+
+        <div class="vet-layout">
+          <div class="vet-patient-list">
+            <div class="f12 fw6 muted mb8" style="padding:6px 10px">ASSIGNED TODAY (4)</div>
+            <div class="vet-patient selected">
+              <div class="animal-avatar">L</div>
+              <div style="flex:1"><div class="fw6">Lakshmi</div><div class="muted f12">C-0042 · Murrah · priority</div></div>
+              <span class="chip sick"><span class="chip-dot"></span>Sick</span>
+            </div>
+            <div class="vet-patient">
+              <div class="animal-avatar">T</div>
+              <div style="flex:1"><div class="fw6">Tara</div><div class="muted f12">C-0055 · routine</div></div>
+            </div>
+            <div class="vet-patient">
+              <div class="animal-avatar" style="background:#FFF3E0;color:#E65100">B5</div>
+              <div style="flex:1"><div class="fw6">Barn B calves (14)</div><div class="muted f12">FMD booster</div></div>
+              <span class="chip info"><span class="chip-dot"></span>Batch</span>
+            </div>
+            <div class="vet-patient">
+              <div class="animal-avatar goat">O3</div>
+              <div style="flex:1"><div class="fw6">Osmanabadi flock 3</div><div class="muted f12">Deworming</div></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card mb16">
+              <div class="flex aic jcb mb16">
+                <div>
+                  <div class="flex aic g12"><div class="animal-avatar" style="width:52px;height:52px;font-size:16px">L</div><div><h3>Lakshmi <span class="muted f13 mono">C-0042</span></h3><div class="muted f12">Murrah buffalo · 6 yr · 485 kg · DIM 98 · last calving 12 Jan</div></div></div>
+                </div>
+                <div class="flex g8"><button class="btn btn-secondary"><i data-lucide="video"></i>Watch clip</button><button class="btn btn-secondary"><i data-lucide="activity"></i>Timeline</button></div>
+              </div>
+              <div class="alert-banner danger" style="margin-bottom:0">
+                <i data-lucide="alert-circle"></i>
+                <div><div class="title">Rumination ↓ 31% · yield ↓ 21% · body cond. 3.0 (was 3.5 last week)</div><div class="f13">Edge-AI suggests: acidosis / LDA / ketosis. Feed log shows new compound feed batch F-4421 introduced 3 days ago.</div></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="mb16">Prescribe treatment</h3>
+              <div class="prescribe-form">
+                <div class="field"><label>Drug (CDSCO)</label><input value="Propylene glycol" /></div>
+                <div class="field"><label>Indication</label><input value="Ketosis / acidosis support" /></div>
+                <div class="field"><label>Route</label><select><option>Oral drench</option><option>IM</option><option>IV</option></select></div>
+                <div class="field"><label>Duration</label><select><option>3 days</option><option>5 days</option><option>7 days</option></select></div>
+              </div>
+
+              <div class="autocomp mt16">
+                <strong>Auto-calculated dose</strong> based on 485 kg Murrah buffalo, CDSCO guidance for propylene glycol: <strong>225 mL BID × 3 days (oral drench)</strong>. No milk withdrawal for propylene glycol; flag for switch to antibiotic if bacterial secondary.
+              </div>
+
+              <div class="prescribe-form">
+                <div class="field"><label>Follow-up drug (if bacterial)</label><input value="Oxytetracycline 5%" /></div>
+                <div class="field"><label>Auto-dose</label><input value="48.5 mL IM, SID × 3d" disabled /></div>
+                <div class="field"><label>Milk withdrawal</label><input value="96 hours" disabled style="background:var(--warning-50)" /></div>
+                <div class="field"><label>Meat withdrawal</label><input value="28 days" disabled style="background:var(--warning-50)" /></div>
+              </div>
+
+              <div class="alert-banner" style="margin:16px 0 0">
+                <i data-lucide="shield-check"></i>
+                <div class="f13">When you sign this prescription, FarmHeaven will auto-quarantine Lakshmi's milk from dispatch until <strong>24 Apr 10:30 AM</strong> and keep her out of the slaughter queue until <strong>18 May</strong>. No manual step needed.</div>
+              </div>
+
+              <div class="flex g8 mt16"><button class="btn btn-secondary">Save draft</button><button class="btn btn-primary"><i data-lucide="feather"></i>Sign &amp; send to owner</button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== ORDERS ===================== -->
+      <section class="view" id="view-orders">
+        <div class="page-header">
+          <div><div class="page-title">Orders</div><div class="page-subtitle">34 subscription renewals today · 12 one-time orders · Dispatch cutoff 3 PM</div></div>
+          <div class="flex g8"><button class="btn btn-secondary"><i data-lucide="map"></i>Plan routes</button><button class="btn btn-primary"><i data-lucide="printer"></i>Print pick lists</button></div>
+        </div>
+        <div class="grid grid-4 mb24">
+          <div class="card"><div class="metric-label">Today's orders</div><div class="metric-value">46</div><div class="muted f12 mt16">₹38,240 value</div></div>
+          <div class="card"><div class="metric-label">Subscription MRR</div><div class="metric-value">₹2.14L</div><div class="muted f12 mt16">+18% MoM</div></div>
+          <div class="card"><div class="metric-label">Active subscribers</div><div class="metric-value">187</div><div class="muted f12 mt16">Retention M3: 76%</div></div>
+          <div class="card"><div class="metric-label">Avg order value</div><div class="metric-value">₹832</div><div class="muted f12 mt16">Top: milk + ghee combo</div></div>
+        </div>
+        <div class="filter-bar">
+          <button class="filter-chip active">Today</button><button class="filter-chip">Tomorrow</button><button class="filter-chip">This week</button>
+          <div style="width:1px;height:24px;background:var(--border-subtle);margin:0 6px"></div>
+          <button class="filter-chip">New</button><button class="filter-chip">Packing</button><button class="filter-chip">Routed</button><button class="filter-chip">Delivered</button>
+          <div style="margin-left:auto"></div><button class="filter-chip"><i data-lucide="search"></i>Find order</button>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <div class="order-row"><div class="animal-avatar" style="background:var(--indigo-600);color:white">AR</div><div><div class="order-customer">Arjun Reddy · <span class="muted mono" style="font-weight:400">#FH-10482</span></div><div class="order-items">2× A2 Ghee 500ml · 1× Kadaknath eggs 12ct · 1× Country chicken 1kg</div></div><div class="muted f13">Jubilee Hills · 11–1 PM</div><div class="order-total">₹2,140</div><span class="order-status status-packing">Packing</span></div>
+          <div class="order-row"><div class="animal-avatar" style="background:var(--turmeric-500);color:#1F1B16">PS</div><div><div class="order-customer">Priya Sharma · <span class="muted mono" style="font-weight:400">#FH-10481</span> · <span style="color:var(--leaf-600);font-weight:600">SUB</span></div><div class="order-items">Weekly box: 3L A2 milk · 1kg spinach · 30 eggs · 500g paneer</div></div><div class="muted f13">Gachibowli · 9–11 AM</div><div class="order-total">₹1,280</div><span class="order-status status-routed">Routed</span></div>
+          <div class="order-row"><div class="animal-avatar" style="background:var(--leaf-600);color:white">MK</div><div><div class="order-customer">Meena Krishnan · <span class="muted mono" style="font-weight:400">#FH-10480</span> · <span style="color:var(--leaf-600);font-weight:600">SUB</span></div><div class="order-items">Weekly box: 2L buffalo milk · 24 eggs · 2kg mixed veg</div></div><div class="muted f13">Banjara Hills · 9–11 AM</div><div class="order-total">₹940</div><span class="order-status status-delivered">Delivered</span></div>
+          <div class="order-row"><div class="animal-avatar" style="background:var(--soil-500);color:white">RV</div><div><div class="order-customer">Rohit Varma · <span class="muted mono" style="font-weight:400">#FH-10479</span></div><div class="order-items">1× Ghee 1L · 2× Honey 500g · Farm tour booking 4 pax (Sat)</div></div><div class="muted f13">Hitech City · 2–4 PM</div><div class="order-total">₹4,820</div><span class="order-status status-new">New</span></div>
+          <div class="order-row"><div class="animal-avatar" style="background:var(--info);color:white">SV</div><div><div class="order-customer">Sneha V · <span class="muted mono" style="font-weight:400">#FH-10478</span> · <span style="color:var(--leaf-600);font-weight:600">SUB</span></div><div class="order-items">Fortnightly box: Seasonal veg assortment + millets 2kg</div></div><div class="muted f13">Kondapur · 11–1 PM</div><div class="order-total">₹1,560</div><span class="order-status status-packing">Packing</span></div>
+          <div class="order-row"><div class="animal-avatar" style="background:var(--danger);color:white">KN</div><div><div class="order-customer">Karthik N · <span class="muted mono" style="font-weight:400">#FH-10477</span></div><div class="order-items">Goat meat 2kg · fresh cut</div></div><div class="muted f13">Madhapur · 2–4 PM</div><div class="order-total">₹1,780</div><span class="order-status status-packing">Packing</span></div>
+        </div>
+      </section>
+
+      <!-- ===================== CUSTOMERS ===================== -->
+      <section class="view" id="view-customers">
+        <div class="page-header">
+          <div><div class="page-title">Customers</div><div class="page-subtitle">412 unique customers · 187 active subscribers · avg LTV ₹14,680</div></div>
+          <div class="flex g8"><button class="btn btn-secondary"><i data-lucide="send"></i>WhatsApp campaign</button><button class="btn btn-primary"><i data-lucide="users"></i>Build segment</button></div>
+        </div>
+
+        <div class="grid grid-4 mb24">
+          <div class="card"><div class="metric-label">New this month</div><div class="metric-value">48</div><span class="metric-delta up"><i data-lucide="trending-up" style="width:12px;height:12px"></i>+22% MoM</span></div>
+          <div class="card"><div class="metric-label">Avg LTV</div><div class="metric-value">₹14,680</div><div class="muted f12 mt16">Subscribers: ₹42,400</div></div>
+          <div class="card"><div class="metric-label">Churn risk</div><div class="metric-value" style="color:var(--warning)">14</div><div class="muted f12 mt16">No order in 21+ days</div></div>
+          <div class="card"><div class="metric-label">NPS (last 30d)</div><div class="metric-value" style="color:var(--leaf-600)">+68</div><div class="muted f12 mt16">n=94 · detractors 6%</div></div>
+        </div>
+
+        <div class="filter-bar">
+          <button class="filter-chip active">All (412)</button>
+          <button class="filter-chip">Subscribers (187)</button>
+          <button class="filter-chip">High LTV (62)</button>
+          <button class="filter-chip">At risk (14)</button>
+          <button class="filter-chip">Farm tour booked (9)</button>
+          <div style="margin-left:auto"></div>
+          <button class="filter-chip"><i data-lucide="sparkles"></i>AI segment: "bought ghee 2× but never eggs"</button>
+        </div>
+
+        <div class="card" style="padding:0;overflow:hidden">
+          <div class="cust-row" style="background:var(--sunken);font-weight:600;font-size:11px;text-transform:uppercase;color:var(--text-muted);letter-spacing:.04em">
+            <div></div><div>Customer</div><div>Orders</div><div>LTV</div><div>Fav SKU</div><div>Status</div>
+          </div>
+          <div class="cust-row"><div class="animal-avatar" style="background:var(--indigo-600);color:white">AR</div><div><div class="fw6">Arjun Reddy</div><div class="muted f12">Jubilee Hills · +91 98XX XX4421</div></div><div class="mono fw6">48</div><div class="mono fw6" style="color:var(--leaf-600)">₹78,200</div><div>A2 Ghee, Country chx</div><span class="chip cert"><span class="chip-dot"></span>Top 10%</span></div>
+          <div class="cust-row"><div class="animal-avatar" style="background:var(--turmeric-500);color:#1F1B16">PS</div><div><div class="fw6">Priya Sharma</div><div class="muted f12">Gachibowli · Subscriber since Sep'25</div></div><div class="mono fw6">31</div><div class="mono fw6">₹42,400</div><div>Weekly box</div><span class="chip info"><span class="chip-dot"></span>Subscriber</span></div>
+          <div class="cust-row"><div class="animal-avatar" style="background:var(--leaf-600);color:white">MK</div><div><div class="fw6">Meena Krishnan</div><div class="muted f12">Banjara Hills · Subscriber</div></div><div class="mono fw6">28</div><div class="mono fw6">₹38,100</div><div>Weekly box, farm tours</div><span class="chip info"><span class="chip-dot"></span>Subscriber</span></div>
+          <div class="cust-row" style="background:var(--warning-50)"><div class="animal-avatar" style="background:var(--soil-500);color:white">VG</div><div><div class="fw6">Vivek Ghosh</div><div class="muted f12">Kondapur · last order 28 days ago</div></div><div class="mono fw6">12</div><div class="mono fw6">₹16,840</div><div>A2 Milk</div><span class="chip warn"><span class="chip-dot"></span>At risk</span></div>
+          <div class="cust-row"><div class="animal-avatar" style="background:var(--info);color:white">SV</div><div><div class="fw6">Sneha V</div><div class="muted f12">Kondapur · Fortnightly</div></div><div class="mono fw6">18</div><div class="mono fw6">₹22,400</div><div>Millets, veg</div><span class="chip info"><span class="chip-dot"></span>Subscriber</span></div>
+        </div>
+      </section>
+
+      <!-- ===================== STOREFRONT ===================== -->
+      <section class="view" id="view-storefront">
+        <div class="page-header">
+          <div><div class="page-title">Storefront preview</div><div class="page-subtitle">farmheaven.in · customer-facing view · changes staging → live on publish</div></div>
+          <div class="flex g8"><button class="btn btn-secondary"><i data-lucide="smartphone"></i>Mobile</button><button class="btn btn-secondary"><i data-lucide="external-link"></i>Open live</button><button class="btn btn-primary"><i data-lucide="upload-cloud"></i>Publish</button></div>
+        </div>
+
+        <div class="store-hero">
+          <div class="trust-badges">
+            <div class="trust-badge"><i data-lucide="leaf"></i>PGS-India</div>
+            <div class="trust-badge"><i data-lucide="heart"></i>94% stress-free hrs</div>
+            <div class="trust-badge"><i data-lucide="cloud-rain"></i>2.14 tCO₂e sequestered</div>
+          </div>
+          <div class="store-hero-content">
+            <span class="store-eyebrow">🌾 Certified organic · PGS-India</span>
+            <h1 class="store-title">Real food from a real farm, 72 acres outside Hyderabad.</h1>
+            <p class="store-subtitle">Cold-chained from our parlor to your door before breakfast. Meet the cow your ghee came from. Subscribe once — eat honestly every week.</p>
+            <div class="flex g12"><button class="btn btn-primary" style="background:white;color:var(--leaf-600);padding:14px 22px;font-size:15px"><i data-lucide="shopping-bag"></i>Start a weekly box · ₹999</button><button class="btn" style="background:rgba(255,255,255,.15);color:white;backdrop-filter:blur(8px);padding:14px 22px;font-size:15px;border:1px solid rgba(255,255,255,.3)"><i data-lucide="play"></i>Watch the farm tour</button></div>
+          </div>
+        </div>
+
+        <div class="flex aic jcb mb16">
+          <h2 class="brand-font" style="font-size:28px;font-weight:700">Today's harvest</h2>
+          <a href="#" style="color:var(--leaf-600);font-weight:600;font-size:14px;text-decoration:none">See all 34 products →</a>
+        </div>
+
+        <div class="grid grid-4 mb24">
+          <div class="product-card"><div class="product-image" style="background:linear-gradient(135deg,#FFF8E1,#FFE082)">🥛<div class="product-badge">FRESH</div></div><div class="product-info"><div class="product-name">A2 Gir cow milk</div><div class="product-desc">Raw, non-homogenized · from Ganga &amp; family</div><div class="product-price"><span class="price-main">₹95</span><span class="price-unit">/ litre</span></div></div></div>
+          <div class="product-card"><div class="product-image" style="background:linear-gradient(135deg,#FFECB3,#FFB74D)">🧈<div class="product-badge">BESTSELLER</div></div><div class="product-info"><div class="product-name">Bilona A2 ghee</div><div class="product-desc">Hand-churned from curd · no shortcuts</div><div class="product-price"><span class="price-main">₹1,850</span><span class="price-unit">/ 500ml</span></div></div></div>
+          <div class="product-card"><div class="product-image" style="background:linear-gradient(135deg,#F3E5F5,#CE93D8)">🥚</div><div class="product-info"><div class="product-name">Kadaknath black eggs</div><div class="product-desc">Free-range · higher protein, less cholesterol</div><div class="product-price"><span class="price-main">₹240</span><span class="price-unit">/ 6 ct</span></div></div></div>
+          <div class="product-card"><div class="product-image" style="background:linear-gradient(135deg,#DCEDC8,#AED581)">🥬<div class="product-badge" style="background:var(--turmeric-500);color:#1F1B16">PICKED TODAY</div></div><div class="product-info"><div class="product-name">Palak (spinach)</div><div class="product-desc">Plot 3 · harvested 6:40 AM today</div><div class="product-price"><span class="price-main">₹60</span><span class="price-unit">/ 500g</span></div></div></div>
+          <div class="product-card"><div class="product-image" style="background:linear-gradient(135deg,#FFF3E0,#FFCC80)">🍯</div><div class="product-info"><div class="product-name">Raw wildflower honey</div><div class="product-desc">From our apiary near neem grove</div><div class="product-price"><span class="price-main">₹680</span><span class="price-unit">/ 500g</span></div></div></div>
+          <div class="product-card"><div class="product-image" style="background:linear-gradient(135deg,#EFEBE9,#A1887F)">🌾</div><div class="product-info"><div class="product-name">Little millet (Samai)</div><div class="product-desc">Ancient grain · low GI · gluten-free</div><div class="product-price"><span class="price-main">₹240</span><span class="price-unit">/ kg</span></div></div></div>
+          <div class="product-card"><div class="product-image" style="background:linear-gradient(135deg,#FFCDD2,#E57373)">🍅</div><div class="product-info"><div class="product-name">Heirloom tomatoes</div><div class="product-desc">Plot 4 · flowering→fruiting · sun-ripened</div><div class="product-price"><span class="price-main">₹80</span><span class="price-unit">/ kg</span></div></div></div>
+          <div class="product-card"><div class="product-image" style="background:linear-gradient(135deg,#FFE0B2,#FFB74D)">🍗</div><div class="product-info"><div class="product-name">Country chicken</div><div class="product-desc">Free-range · halal · vacuum packed</div><div class="product-price"><span class="price-main">₹520</span><span class="price-unit">/ kg</span></div></div></div>
+        </div>
+
+        <div class="card" style="background:linear-gradient(135deg,var(--leaf-50),var(--turmeric-50));border-color:var(--leaf-500);padding:30px">
+          <div class="flex aic jcb" style="flex-wrap:wrap;gap:20px">
+            <div><h3 class="brand-font" style="font-size:28px;margin-bottom:8px">Meet the cow behind your milk.</h3><p class="secondary" style="max-width:480px;font-size:15px">Every pack has a QR code. Scan it — see which animal, which plot, who milked, who packed. Real traceability, not a sticker.</p></div>
+            <button class="btn btn-primary" style="padding:14px 22px;font-size:15px"><i data-lucide="qr-code"></i>See how traceability works</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== FINANCE ===================== -->
+      <section class="view" id="view-finance">
+        <div class="page-header">
+          <div><div class="page-title">Finance</div><div class="page-subtitle">FY26 · P&amp;L per cost center · GST · agricultural income split · subsidy auto-claim</div></div>
+          <div class="flex g8"><button class="btn btn-secondary"><i data-lucide="scan-line"></i>OCR bill</button><button class="btn btn-primary"><i data-lucide="file-text"></i>Export P&amp;L</button></div>
+        </div>
+
+        <div class="grid grid-4 mb24">
+          <div class="card metric-card"><div class="metric-label">Revenue MTD</div><div class="metric-value">₹6.84L</div><span class="metric-delta up"><i data-lucide="trending-up" style="width:12px;height:12px"></i>+14% MoM</span></div>
+          <div class="card metric-card danger"><div class="metric-label">Expenses MTD</div><div class="metric-value">₹4.12L</div><div class="muted f12 mt16">Feed 38% · wages 22% · packaging 12%</div></div>
+          <div class="card metric-card turmeric"><div class="metric-label">Gross margin</div><div class="metric-value">39.8%</div><div class="muted f12 mt16">Target 45% by Q4</div></div>
+          <div class="card metric-card indigo"><div class="metric-label">Cash position</div><div class="metric-value">₹18.4L</div><div class="muted f12 mt16">Runway 5.2 mo</div></div>
+        </div>
+
+        <div class="grid grid-6-6 mb24">
+          <div class="card">
+            <div class="card-header"><div class="card-title">P&amp;L per cost center (30d)</div></div>
+            <div class="chart-wrap"><canvas id="pnlChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Margin per SKU (top 6)</div></div>
+            <div class="chart-wrap"><canvas id="marginChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Subsidy auto-submit -->
+        <div class="card mb24" style="padding:0;overflow:hidden">
+          <div style="padding:18px" class="card-header">
+            <div><div class="card-title">Subsidy auto-claim <span class="new-tag" style="position:static;margin-left:8px">NEW</span></div><div class="muted f12" style="margin-top:4px">Eligibility detected from your operations · FarmHeaven fills the forms + submits · you just sign</div></div>
+            <div class="flex aic g8"><span class="muted f13">Saved YTD:</span><strong style="color:var(--leaf-600);font-size:16px">₹1.42L</strong></div>
+          </div>
+          <div>
+            <div class="subsidy-row"><div><div class="subsidy-name">Rythu Bandhu investment support</div><div class="muted f12">State scheme · per acre · semi-annual</div></div><div class="subsidy-amount">₹52,000</div><span class="status-pill status-submitted">Submitted 04 Apr</span><button class="btn btn-ghost" style="padding:6px"><i data-lucide="chevron-right"></i></button></div>
+            <div class="subsidy-row"><div><div class="subsidy-name">NABARD dairy modernization loan interest subvention</div><div class="muted f12">Central · interest subsidy on parlor equipment loan</div></div><div class="subsidy-amount">₹86,400</div><span class="status-pill status-ready">Ready to sign</span><button class="btn btn-primary" style="padding:6px 12px">Sign &amp; submit</button></div>
+            <div class="subsidy-row"><div><div class="subsidy-name">Telangana Organic Mission · certification grant</div><div class="muted f12">State · reimburses PGS cert fees</div></div><div class="subsidy-amount">₹18,500</div><span class="status-pill status-pending">Docs needed</span><button class="btn btn-secondary" style="padding:6px 12px">Attach invoice</button></div>
+            <div class="subsidy-row"><div><div class="subsidy-name">PMKSY drip irrigation 55% subsidy</div><div class="muted f12">Central · Per micro-irrigation setup (Plot 4)</div></div><div class="subsidy-amount">₹1,12,000</div><span class="status-pill status-draft">Draft — form 74% filled</span><button class="btn btn-secondary" style="padding:6px 12px">Finish form</button></div>
+            <div class="subsidy-row"><div><div class="subsidy-name">Kadaknath poultry promotion (MP + state)</div><div class="muted f12">State · per breeding pair</div></div><div class="subsidy-amount">₹24,000</div><span class="status-pill status-ready">Ready to sign</span><button class="btn btn-primary" style="padding:6px 12px">Sign &amp; submit</button></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Recent expenses (OCR captured)</div><button class="btn btn-ghost"><i data-lucide="plus"></i>Add</button></div>
+          <table class="table">
+            <thead><tr><th>Date</th><th>Vendor</th><th>Category</th><th>Cost center</th><th>Amount</th><th>GST</th><th>Source</th></tr></thead>
+            <tbody>
+              <tr><td>19 Apr</td><td>Andhra Organics</td><td>Feed</td><td>Dairy</td><td class="mono fw6">₹24,800</td><td>5%</td><td><span class="chip info"><span class="chip-dot"></span>OCR</span></td></tr>
+              <tr><td>18 Apr</td><td>Redwing Robotics</td><td>Drone service</td><td>Crops</td><td class="mono fw6">₹1,800</td><td>18%</td><td><span class="chip info"><span class="chip-dot"></span>OCR</span></td></tr>
+              <tr><td>17 Apr</td><td>Dr. N. Reddy</td><td>Vet fees</td><td>Dairy</td><td class="mono fw6">₹2,500</td><td>—</td><td><span class="chip healthy"><span class="chip-dot"></span>Manual</span></td></tr>
+              <tr><td>15 Apr</td><td>Green Valley Seeds</td><td>Seeds</td><td>Crops</td><td class="mono fw6">₹6,400</td><td>5%</td><td><span class="chip info"><span class="chip-dot"></span>OCR</span></td></tr>
+              <tr><td>14 Apr</td><td>Local carpenter</td><td>Repairs</td><td>Infra</td><td class="mono fw6">₹4,200</td><td>—</td><td><span class="chip healthy"><span class="chip-dot"></span>Manual</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================== WELFARE & CARBON (NEW) ===================== -->
+      <section class="view" id="view-welfare">
+        <div class="page-header">
+          <div><div class="page-title">Welfare &amp; Carbon <span class="new-tag" style="position:static;margin-left:8px">NEW</span></div><div class="page-subtitle">Auto-computed from edge-AI cameras + compost pipeline + soil organic carbon · exportable as storefront badges + quarterly PDF</div></div>
+          <div class="flex g8"><button class="btn btn-secondary"><i data-lucide="file-text"></i>Quarterly PDF</button><button class="btn btn-primary"><i data-lucide="share-2"></i>Publish badges to storefront</button></div>
+        </div>
+
+        <div class="alert-banner success">
+          <i data-lucide="sparkles"></i>
+          <div style="flex:1"><div class="title">You're one of the only farms measuring this.</div><div class="f13">Nobody else in Indian agritech quantifies stress-free hours or on-farm carbon. Use these numbers in your storefront, ad copy, and investor decks.</div></div>
+        </div>
+
+        <div class="grid grid-3 mb24">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Dairy herd welfare</div></div>
+            <div class="welfare-ring"><canvas id="welfareDairy"></canvas><div class="welfare-pct"><div class="big">94.2%</div><div class="lbl">stress-free hrs</div></div></div>
+            <div class="muted f12 tc mt16">Panting 1.8% · crowding 3.2% · abnormal vocals 0.8%</div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Small ruminant welfare</div></div>
+            <div class="welfare-ring"><canvas id="welfareGoat"></canvas><div class="welfare-pct"><div class="big">96.1%</div><div class="lbl">stress-free hrs</div></div></div>
+            <div class="muted f12 tc mt16">Mostly free-range · vocal distress near weaning</div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Poultry welfare</div></div>
+            <div class="welfare-ring"><canvas id="welfarePoultry"></canvas><div class="welfare-pct"><div class="big">89.4%</div><div class="lbl">stress-free hrs</div></div></div>
+            <div class="muted f12 tc mt16">Shed 1 huddling events 4× above target — review lighting</div>
+          </div>
+        </div>
+
+        <div class="grid grid-6-6 mb24">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Welfare timeline (90 days)</div></div>
+            <div class="chart-wrap"><canvas id="welfareTl"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Carbon inventory</div></div>
+            <div class="flex g12 mb12">
+              <div style="flex:1;padding:14px;background:var(--leaf-50);border-radius:10px"><div class="f12 muted">Sequestered YTD</div><div class="fw7 mono" style="font-size:22px;color:var(--leaf-600)">+2.14 tCO₂e</div></div>
+              <div style="flex:1;padding:14px;background:var(--danger-50);border-radius:10px"><div class="f12 muted">Emitted (scope 1+2)</div><div class="fw7 mono" style="font-size:22px;color:var(--danger)">-1.06 tCO₂e</div></div>
+            </div>
+            <div style="padding:14px;background:var(--turmeric-50);border:1px solid var(--turmeric-500);border-radius:10px;margin-bottom:12px"><div class="f12 muted">Net position YTD</div><div class="fw7 mono" style="font-size:26px;color:#8a6008">+1.08 tCO₂e</div><div class="f12 muted mt16">≈ 1 passenger car · 1 year</div></div>
+            <div class="f13 secondary">Source breakdown: compost 54%, perennials/silvopasture 28%, regenerative tillage 18%. Emissions: enteric CH₄ 61%, diesel 24%, grid electricity 15%.</div>
+          </div>
+        </div>
+
+        <!-- Storefront badge preview -->
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Storefront badges · preview</div><div class="muted f12" style="margin-top:4px">Auto-published next to every product on farmheaven.in when you hit Publish</div></div></div>
+          <div class="grid grid-3 g16">
+            <div class="badge-mock">
+              <div class="badge-seal">94%<br>STRESS<br>FREE</div>
+              <div><div class="fw7 brand-font" style="font-size:17px">Happy herd certified</div><div class="muted f13 mt16">Verified by continuous edge-AI observation — panting, crowding, and vocal stress measured 24/7 across 90 days.</div></div>
+            </div>
+            <div class="badge-mock" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9);border-color:var(--leaf-600)">
+              <div class="badge-seal" style="background:radial-gradient(circle at 30% 30%,var(--leaf-500),var(--leaf-600));font-size:11px">NET<br>CARBON<br>+</div>
+              <div><div class="fw7 brand-font" style="font-size:17px">Carbon-positive farm</div><div class="muted f13 mt16">Sequestered 1.08 tCO₂e more than we emitted YTD. Compost, silvopasture, perennials doing real work.</div></div>
+            </div>
+            <div class="badge-mock" style="background:linear-gradient(135deg,var(--indigo-50),#E3EAFC);border-color:var(--indigo-600)">
+              <div class="badge-seal" style="background:radial-gradient(circle at 30% 30%,#6978C8,var(--indigo-600));font-size:11px">PGS<br>INDIA<br>100%</div>
+              <div><div class="fw7 brand-font" style="font-size:17px">Full input traceability</div><div class="muted f13 mt16">Every feed batch, every seed lot, every bio-input — logged, cert-checked, and auditable.</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== REPORTS ===================== -->
+      <section class="view" id="view-reports">
+        <div class="page-header">
+          <div><div class="page-title">Reports &amp; Compliance</div><div class="page-subtitle">Pre-built reports · custom builder · one-click compliance PDFs</div></div>
+          <div class="flex g8"><button class="btn btn-primary"><i data-lucide="plus"></i>New report</button></div>
+        </div>
+
+        <div class="grid grid-3 g16 mb24">
+          <div class="card" style="cursor:pointer;border-left:4px solid var(--leaf-600)">
+            <div class="flex aic g12 mb12"><i data-lucide="file-check-2" style="width:26px;height:26px;color:var(--leaf-600)"></i><strong class="f13">PGS-INDIA / NPOP AUDIT PACKET</strong></div>
+            <h3 class="mb8">Annual organic compliance PDF</h3>
+            <div class="muted f13 mb12">Auto-compiled from input logs, soil lab, supplier cert status, animal health log, and withdrawal quarantines.</div>
+            <div class="flex aic jcb"><span class="chip cert"><span class="chip-dot"></span>Next audit 12 Jul 2026</span><button class="btn btn-primary" style="padding:6px 14px">Generate PDF</button></div>
+          </div>
+          <div class="card" style="cursor:pointer;border-left:4px solid var(--turmeric-500)">
+            <div class="flex aic g12 mb12"><i data-lucide="heart" style="width:26px;height:26px;color:var(--turmeric-500)"></i><strong class="f13">WELFARE &amp; CARBON · QUARTERLY</strong></div>
+            <h3 class="mb8">Q1 2026 sustainability report</h3>
+            <div class="muted f13 mb12">Stress-free hours, welfare events timeline, carbon position, water footprint, soil organic carbon trend.</div>
+            <div class="flex aic jcb"><span class="chip warn"><span class="chip-dot"></span>Draft 82% complete</span><button class="btn btn-secondary" style="padding:6px 14px">Preview</button></div>
+          </div>
+          <div class="card" style="cursor:pointer;border-left:4px solid var(--indigo-600)">
+            <div class="flex aic g12 mb12"><i data-lucide="bar-chart-3" style="width:26px;height:26px;color:var(--indigo-600)"></i><strong class="f13">BUSINESS P&amp;L</strong></div>
+            <h3 class="mb8">Monthly per-SKU margin</h3>
+            <div class="muted f13 mb12">Revenue, cost-of-production, gross margin for every SKU. CSA retention cohort. CAC / LTV.</div>
+            <div class="flex aic jcb"><span class="chip info"><span class="chip-dot"></span>Auto 1st of month</span><button class="btn btn-secondary" style="padding:6px 14px">View Mar</button></div>
+          </div>
+          <div class="card" style="cursor:pointer">
+            <div class="flex aic g12 mb12"><i data-lucide="milk" style="width:22px;height:22px;color:var(--soil-500)"></i><strong class="f13">LACTATION</strong></div>
+            <h3 class="mb8">Per-animal milk yield vs breed benchmark</h3>
+            <div class="muted f13 mb12">Daily + 305-day projected yields, peak, persistence, SCC.</div>
+          </div>
+          <div class="card" style="cursor:pointer">
+            <div class="flex aic g12 mb12"><i data-lucide="drumstick" style="width:22px;height:22px;color:var(--turmeric-500)"></i><strong class="f13">POULTRY FCR</strong></div>
+            <h3 class="mb8">Broiler batch performance</h3>
+            <div class="muted f13 mb12">FCR vs Cobb/Ross target, mortality %, market readiness day.</div>
+          </div>
+          <div class="card" style="cursor:pointer">
+            <div class="flex aic g12 mb12"><i data-lucide="droplet" style="width:22px;height:22px;color:var(--info)"></i><strong class="f13">WATER FOOTPRINT</strong></div>
+            <h3 class="mb8">Litres per kg produce</h3>
+            <div class="muted f13 mb12">Tracked via flow meters + ET sensors. Benchmark vs conventional.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Custom report builder</div><div class="muted f12" style="margin-top:4px">Pick entity + timeframe + aggregation → save as template</div></div></div>
+          <div class="empty"><i data-lucide="layout-template"></i><div>Drag a report template or start from scratch</div></div>
+        </div>
+      </section>
+
+      <!-- ===================== WORKER APP (NEW) ===================== -->
+      <section class="view" id="view-worker">
+        <div class="page-header">
+          <div><div class="page-title">Worker App preview <span class="new-tag" style="position:static;margin-left:8px">NEW</span></div><div class="page-subtitle">WhatsApp-native · offline-first · voice notes in Telugu / Hindi / English · geo-fenced check-in</div></div>
+          <div class="flex g8"><button class="btn btn-secondary"><i data-lucide="smartphone"></i>Share install link</button></div>
+        </div>
+
+        <div class="grid" style="grid-template-columns:1fr 1fr 1fr;gap:20px;align-items:flex-start">
+
+          <!-- Phone 1: Chat / voice -->
+          <div>
+            <div class="tc mb12 fw6 secondary">Voice-first capture</div>
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <div class="phone-statusbar"><span>9:42</span><span>📶 🔋 84%</span></div>
+                <div class="phone-header">
+                  <div><div style="font-size:11px;opacity:.85">FarmHeaven Bot</div><div style="font-size:15px;font-weight:700">Ramesh గ‌మ‌ని‌క‌లు</div></div>
+                  <i data-lucide="more-vertical"></i>
+                </div>
+                <div class="phone-body">
+                  <div class="chat-bubble bot"><div class="sender">FarmHeaven</div>గుడ్ మార్నింగ్ Ramesh! 🌅<br>ఈ రోజు 5 tasks ఉన్నాయి. Start చేద్దామా?</div>
+                  <div class="chat-bubble user">
+                    <div class="voice-bar">
+                      <i data-lucide="mic" style="width:16px;height:16px;color:var(--leaf-600)"></i>
+                      <div class="voice-viz"><span style="height:6px"></span><span style="height:10px"></span><span style="height:16px"></span><span style="height:12px"></span><span style="height:18px"></span><span style="height:8px"></span><span style="height:14px"></span><span style="height:10px"></span><span style="height:6px"></span></div>
+                      <span class="f12 muted">0:07</span>
+                    </div>
+                    <div class="f12 muted mt16" style="margin-top:6px">అనువాదం → "Cow 42 feed thinaledu, water bagane untundhi"</div>
+                  </div>
+                  <div class="chat-bubble bot">
+                    <div class="sender">FarmHeaven</div>
+                    ✓ Lakshmi (C-0042) కు health event log ayyindi.<br>Vet task create అయ్యింది — Dr. Reddy 10:30 AMకు వస్తున్నారు.<br>Video clip కూడా attach చేశాను.
+                  </div>
+                  <div class="chat-bubble user" style="background:var(--turmeric-50)">
+                    <i data-lucide="camera" style="width:14px;height:14px;color:#8a5b00"></i> Photo · dung sample
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Phone 2: Today's tasks -->
+          <div>
+            <div class="tc mb12 fw6 secondary">Today's assignment</div>
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <div class="phone-statusbar"><span>9:42</span><span>📶 🔋 84%</span></div>
+                <div class="phone-header" style="background:linear-gradient(135deg,var(--soil-500),var(--soil-700))">
+                  <div><div style="font-size:11px;opacity:.85">ఈ రోజు</div><div style="font-size:15px;font-weight:700">5 tasks · Mon 20 Apr</div></div>
+                  <i data-lucide="bell"></i>
+                </div>
+                <div class="phone-body">
+                  <div style="background:var(--raised);border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:var(--elev-1);border-left:4px solid var(--danger)">
+                    <div class="f12 muted">6:30 AM · పొలం 3</div>
+                    <div class="fw6" style="font-size:14px;margin:4px 0">Palak కోత · 45 kg</div>
+                    <div class="f12 muted">+ 2 మంది · 3 PM కు dispatch</div>
+                    <button class="btn btn-primary w100 mt16" style="justify-content:center;padding:8px">Start</button>
+                  </div>
+                  <div style="background:var(--raised);border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:var(--elev-1);border-left:4px solid var(--turmeric-500)">
+                    <div class="f12 muted">10:00 AM · Plot 4</div>
+                    <div class="fw6" style="font-size:14px;margin:4px 0">Drip lines check</div>
+                    <div class="f12 muted">Zone 4 watering ends 10:30</div>
+                  </div>
+                  <div style="background:var(--raised);border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:var(--elev-1);opacity:.65">
+                    <div class="f12 muted">✓ 6:12 AM · పార్ల‌ర్ 1</div>
+                    <div class="fw6" style="font-size:13px;text-decoration:line-through">Morning milking</div>
+                    <div class="f12" style="color:var(--leaf-600)">241 L · auto-logged</div>
+                  </div>
+                  <div style="background:var(--leaf-50);border-radius:12px;padding:12px;border:1px dashed var(--leaf-600);text-align:center">
+                    <i data-lucide="map-pin" style="width:18px;height:18px;color:var(--leaf-600)"></i>
+                    <div class="fw6 f13" style="margin-top:4px">Gate check-in ✓</div>
+                    <div class="f12 muted">6:08 AM · within geofence</div>
+                  </div>
+                </div>
+                <div class="phone-nav">
+                  <a class="active"><i data-lucide="list-todo"></i>Tasks</a>
+                  <a><i data-lucide="mic"></i>Voice</a>
+                  <a><i data-lucide="camera"></i>Photo</a>
+                  <a><i data-lucide="wallet"></i>Pay</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Phone 3: Payslip -->
+          <div>
+            <div class="tc mb12 fw6 secondary">Digital payslip</div>
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <div class="phone-statusbar"><span>9:42</span><span>📶 🔋 84%</span></div>
+                <div class="phone-header" style="background:linear-gradient(135deg,var(--turmeric-500),#b8820a);color:#1F1B16">
+                  <div><div style="font-size:11px;opacity:.8">Payslip</div><div style="font-size:15px;font-weight:700">Apr 2026</div></div>
+                  <i data-lucide="share"></i>
+                </div>
+                <div class="phone-body" style="background:var(--canvas)">
+                  <div class="tc mb16" style="padding:20px 0">
+                    <div class="muted f12">NET PAY</div>
+                    <div class="brand-font fw7" style="font-size:44px;color:var(--leaf-600);line-height:1.1">₹14,323</div>
+                    <div class="f12 muted">credits to account ···4421 on 30 Apr</div>
+                  </div>
+                  <div style="background:var(--raised);border-radius:12px;padding:14px;box-shadow:var(--elev-1)">
+                    <div class="flex aic jcb mb12"><span class="muted f13">Days worked</span><strong>26</strong></div>
+                    <div class="flex aic jcb mb12"><span class="muted f13">Wage rate</span><strong class="mono">₹650/d</strong></div>
+                    <div class="flex aic jcb mb12"><span class="muted f13">Gross</span><strong class="mono">₹16,900</strong></div>
+                    <div class="flex aic jcb mb12"><span class="muted f13">PF (12%)</span><strong class="mono">-₹2,028</strong></div>
+                    <div class="flex aic jcb mb12"><span class="muted f13">ESIC (3.25%)</span><strong class="mono">-₹549</strong></div>
+                    <hr style="border:0;border-top:1px solid var(--border-subtle)">
+                    <div class="flex aic jcb" style="margin-top:8px"><span class="fw6">Net</span><strong class="mono fw7" style="color:var(--leaf-600)">₹14,323</strong></div>
+                  </div>
+                  <div class="f12 muted tc mt16">Tap to download · signed by Suprameds</div>
+                </div>
+                <div class="phone-nav">
+                  <a><i data-lucide="list-todo"></i>Tasks</a>
+                  <a><i data-lucide="mic"></i>Voice</a>
+                  <a><i data-lucide="camera"></i>Photo</a>
+                  <a class="active"><i data-lucide="wallet"></i>Pay</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt24" style="background:linear-gradient(135deg,var(--leaf-50),#F5FBF5);border-color:var(--leaf-500)">
+          <div class="flex aic g16">
+            <i data-lucide="languages" style="width:32px;height:32px;color:var(--leaf-600)"></i>
+            <div style="flex:1">
+              <h3 class="brand-font">Voice in Telugu, Hindi, or English — whichever the worker speaks</h3>
+              <div class="muted f13 mt16">Whisper API transcribes, our NER tags the right animal / plot / SKU, and the event goes straight into FarmHeaven. This is the single biggest UX differentiator for rural India — and our 18-month moat before Herdwatch or Stellapps catch up.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== SETTINGS ===================== -->
+      <section class="view" id="view-settings">
+        <div class="page-header">
+          <div><div class="page-title">Settings</div><div class="page-subtitle">Farm profile · users &amp; roles · devices · integrations · localization</div></div>
+        </div>
+
+        <div class="tabs">
+          <button class="active">Farm profile</button>
+          <button>Users &amp; roles</button>
+          <button>Devices</button>
+          <button>Integrations</button>
+          <button>Localization</button>
+          <button>Billing</button>
+        </div>
+
+        <div class="grid grid-6-6">
+          <div class="card">
+            <h3 class="mb16">Farm profile</h3>
+            <div class="setting-row"><div><div class="setting-label">Farm name</div><div class="setting-hint">Shown on storefront + audit PDFs</div></div><strong>FarmHeaven · Hyderabad</strong></div>
+            <div class="setting-row"><div><div class="setting-label">Location</div><div class="setting-hint">Geo-pinned boundary for weather + geofence</div></div><strong>17.458° N, 78.328° E</strong></div>
+            <div class="setting-row"><div><div class="setting-label">Total acres</div><div class="setting-hint">Used for subsidy and yield ratios</div></div><strong>72</strong></div>
+            <div class="setting-row"><div><div class="setting-label">Certifications</div><div class="setting-hint">Valid certs drive compliance automations</div></div><div class="flex g8"><span class="chip cert"><span class="chip-dot"></span>PGS-India</span><span class="chip cert"><span class="chip-dot"></span>FSSAI</span></div></div>
+            <div class="setting-row"><div><div class="setting-label">Primary contact</div><div class="setting-hint">WhatsApp + SMS channel</div></div><strong>+91 98XX XX0001</strong></div>
+          </div>
+
+          <div class="card">
+            <h3 class="mb16">Integrations</h3>
+            <div class="integration-card"><div class="integration-logo" style="background:#528FF0;color:white">Rp</div><div style="flex:1"><div class="fw6">Razorpay</div><div class="muted f12">UPI autopay · subscription e-mandate · settlement</div></div><span class="chip healthy"><span class="chip-dot"></span>Connected</span></div>
+            <div class="integration-card"><div class="integration-logo" style="background:#25D366;color:white">Wa</div><div style="flex:1"><div class="fw6">WhatsApp Cloud API</div><div class="muted f12">Worker bot · customer notifications · payslips</div></div><span class="chip healthy"><span class="chip-dot"></span>Connected</span></div>
+            <div class="integration-card"><div class="integration-logo" style="background:var(--leaf-600);color:white">St</div><div style="flex:1"><div class="fw6">Stellapps</div><div class="muted f12">Co-op milk collection relay (read-only)</div></div><span class="chip info"><span class="chip-dot"></span>Available</span></div>
+            <div class="integration-card"><div class="integration-logo" style="background:var(--turmeric-500);color:#1F1B16">DH</div><div style="flex:1"><div class="fw6">DeHaat</div><div class="muted f12">Inputs marketplace · bulk order + subsidy claim relay</div></div><span class="chip healthy"><span class="chip-dot"></span>Connected</span></div>
+            <div class="integration-card"><div class="integration-logo" style="background:#1F1B16;color:var(--turmeric-500)">Rw</div><div style="flex:1"><div class="fw6">Redwing Robotics (drones)</div><div class="muted f12">Monthly NDVI flights · ₹25/acre</div></div><span class="chip healthy"><span class="chip-dot"></span>Connected</span></div>
+            <div class="integration-card"><div class="integration-logo" style="background:#E8F5E9;color:var(--leaf-600)">An</div><div style="flex:1"><div class="fw6">Anand AU soil lab</div><div class="muted f12">Mail-in sample kits · PDF ingestion</div></div><span class="chip info"><span class="chip-dot"></span>Available</span></div>
+          </div>
+
+          <div class="card">
+            <h3 class="mb16">Localization</h3>
+            <div class="setting-row"><div><div class="setting-label">Console language</div><div class="setting-hint">Owner + operator UI</div></div><div class="lang-toggle"><span class="active">EN</span><span>తె</span><span>हि</span></div></div>
+            <div class="setting-row"><div><div class="setting-label">Worker app language</div><div class="setting-hint">Default for new workers; each can override</div></div><div class="lang-toggle"><span>EN</span><span class="active">తె</span><span>हि</span></div></div>
+            <div class="setting-row"><div><div class="setting-label">Voice transcription</div><div class="setting-hint">Whisper STT · Telugu + Hindi + Indian English</div></div><div class="rule-toggle"></div></div>
+            <div class="setting-row"><div><div class="setting-label">Storefront language</div><div class="setting-hint">Customer-facing</div></div><div class="lang-toggle"><span class="active">EN</span><span>తె</span><span>हि</span></div></div>
+            <div class="setting-row"><div><div class="setting-label">Currency + dates</div><div class="setting-hint">Applies everywhere</div></div><strong>INR · DD-MM-YYYY</strong></div>
+          </div>
+
+          <div class="card">
+            <h3 class="mb16">Users &amp; roles</h3>
+            <div class="integration-card"><div class="animal-avatar" style="background:var(--turmeric-500);color:#1F1B16">S</div><div style="flex:1"><div class="fw6">Suprameds</div><div class="muted f12">Owner · full access</div></div><span class="chip healthy"><span class="chip-dot"></span>Active</span></div>
+            <div class="integration-card"><div class="animal-avatar">R</div><div style="flex:1"><div class="fw6">Ramesh Anand</div><div class="muted f12">Field supervisor · worker app</div></div><span class="chip healthy"><span class="chip-dot"></span>Active</span></div>
+            <div class="integration-card"><div class="animal-avatar" style="background:var(--info-50);color:var(--info)">N</div><div style="flex:1"><div class="fw6">Dr. N. Reddy</div><div class="muted f12">External vet · scoped vet workspace</div></div><span class="chip info"><span class="chip-dot"></span>External</span></div>
+            <div class="integration-card"><div class="animal-avatar" style="background:var(--indigo-50);color:var(--indigo-600)">A</div><div style="flex:1"><div class="fw6">Anjali K</div><div class="muted f12">Accountant · finance + reports read/write</div></div><span class="chip healthy"><span class="chip-dot"></span>Active</span></div>
+            <button class="btn btn-secondary w100 mt16" style="justify-content:center"><i data-lucide="user-plus"></i>Invite user</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  lucide.createIcons();
+
+  // view routing
+  const links = document.querySelectorAll('.nav a');
+  const views = document.querySelectorAll('.view');
+  links.forEach(a => a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = a.dataset.view;
+    links.forEach(l => l.classList.remove('active'));
+    a.classList.add('active');
+    views.forEach(v => v.classList.remove('active'));
+    const view = document.getElementById('view-' + target);
+    if (view) view.classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }));
+
+  // Chart.js defaults
+  Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+  Chart.defaults.color = '#5A5346';
+  Chart.defaults.borderColor = '#E5DFD0';
+
+  const mkSpark = (id, data, color) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    new Chart(el, {
+      type:'line',
+      data:{labels:data.map((_,i)=>i), datasets:[{data, borderColor:color, backgroundColor:color+'22', fill:true, tension:0.4, pointRadius:0, borderWidth:2}]},
+      options:{plugins:{legend:{display:false}, tooltip:{enabled:false}}, scales:{x:{display:false},y:{display:false}}, responsive:true, maintainAspectRatio:false}
+    });
+  };
+  mkSpark('sp1',[420,440,445,460,455,470,465,480,475,486],'#3B7A3F');
+  mkSpark('sp2',[1120,1150,1180,1190,1200,1210,1220,1225,1240,1248],'#E0A415');
+  mkSpark('sp3',[8,9,11,10,12,13,11,14,13,14],'#8B6A4A');
+  mkSpark('sp4',[82,89,95,92,98,101,105,108,110,112],'#3B4CA0');
+
+  const days30 = Array.from({length:30},(_,i)=>`${i+1}`);
+  const milkEl = document.getElementById('milkChart');
+  if (milkEl) new Chart(milkEl, {
+    type:'line',
+    data:{labels:days30,datasets:[
+      {label:'Murrah', data:days30.map((_,i)=>200+Math.sin(i/3)*12+i*0.6+Math.random()*8), borderColor:'#E0A415', backgroundColor:'#E0A41522', fill:true, tension:0.35, pointRadius:0, borderWidth:2},
+      {label:'Gir', data:days30.map((_,i)=>130+Math.cos(i/4)*10+i*0.3+Math.random()*6), borderColor:'#3B7A3F', backgroundColor:'#3B7A3F22', fill:true, tension:0.35, pointRadius:0, borderWidth:2},
+      {label:'Sahiwal', data:days30.map((_,i)=>90+Math.sin(i/2)*8+i*0.2+Math.random()*5), borderColor:'#3B4CA0', backgroundColor:'#3B4CA022', fill:true, tension:0.35, pointRadius:0, borderWidth:2}
+    ]},
+    options:{plugins:{legend:{display:false}},responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{grid:{color:'#E5DFD0'}}}}
+  });
+
+  const eggEl = document.getElementById('eggChart');
+  if (eggEl) new Chart(eggEl, {
+    type:'bar',
+    data:{labels:days30,datasets:[
+      {label:'Shed 1', data:days30.map((_,i)=>620+Math.sin(i/5)*30+i*1+Math.random()*20), backgroundColor:'#E0A415', borderRadius:4, stack:'a'},
+      {label:'Shed 2', data:days30.map((_,i)=>520+Math.cos(i/4)*25+i*0.8+Math.random()*18), backgroundColor:'#8B6A4A', borderRadius:4, stack:'a'}
+    ]},
+    options:{plugins:{legend:{display:false}},responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false},stacked:true},y:{grid:{color:'#E5DFD0'},stacked:true}}}
+  });
+
+  // finance P&L
+  const pnlEl = document.getElementById('pnlChart');
+  if (pnlEl) new Chart(pnlEl, {
+    type:'bar',
+    data:{labels:['Dairy','Poultry','Small Rum.','Crops','Storefront'],
+      datasets:[
+        {label:'Revenue',data:[420,280,140,180,380],backgroundColor:'#3B7A3F',borderRadius:4},
+        {label:'Expense',data:[280,190,90,140,110],backgroundColor:'#C62828',borderRadius:4}
+      ]},
+    options:{plugins:{legend:{position:'bottom'}},responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{grid:{color:'#E5DFD0'}}}}
+  });
+  const marginEl = document.getElementById('marginChart');
+  if (marginEl) new Chart(marginEl, {
+    type:'bar',
+    data:{labels:['A2 Ghee','Kadaknath eggs','Honey','A2 Milk','Country chx','Millets'],
+      datasets:[{label:'Margin %',data:[62,54,48,34,32,28],backgroundColor:['#3B7A3F','#4E9E54','#E0A415','#8B6A4A','#C4BBA6','#C4BBA6'],borderRadius:6}]},
+    options:{indexAxis:'y',plugins:{legend:{display:false}},responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'#E5DFD0'}},y:{grid:{display:false}}}}
+  });
+
+  // welfare rings
+  const mkRing = (id, pct, color) => {
+    const el = document.getElementById(id); if (!el) return;
+    new Chart(el,{type:'doughnut',data:{datasets:[{data:[pct,100-pct],backgroundColor:[color,'#F2EDE0'],borderWidth:0}]},
+      options:{cutout:'72%',plugins:{legend:{display:false},tooltip:{enabled:false}},responsive:true,maintainAspectRatio:false}
+    });
+  };
+  mkRing('welfareDairy',94.2,'#3B7A3F');
+  mkRing('welfareGoat',96.1,'#4E9E54');
+  mkRing('welfarePoultry',89.4,'#E0A415');
+
+  const wlEl = document.getElementById('welfareTl');
+  if (wlEl) {
+    const d = Array.from({length:90},(_,i)=>`${i+1}`);
+    new Chart(wlEl,{type:'line',data:{labels:d,datasets:[
+      {label:'Dairy',data:d.map((_,i)=>92+Math.sin(i/10)*3+Math.random()*2),borderColor:'#3B7A3F',tension:.35,pointRadius:0,borderWidth:2,fill:false},
+      {label:'Poultry',data:d.map((_,i)=>88+Math.cos(i/8)*4+Math.random()*2),borderColor:'#E0A415',tension:.35,pointRadius:0,borderWidth:2,fill:false}
+    ]},options:{plugins:{legend:{position:'bottom'}},responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{min:80,max:100,grid:{color:'#E5DFD0'}}}}});
+  }
+
+  // sensor sparklines
+  document.querySelectorAll('.sensor-chart-wrap canvas').forEach((c)=>{
+    const d = Array.from({length:24},()=>Math.random()*100);
+    new Chart(c,{type:'line',data:{labels:d,datasets:[{data:d,borderColor:'#3B7A3F',backgroundColor:'#3B7A3F22',fill:true,tension:0.4,pointRadius:0,borderWidth:1.5}]},options:{plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}},responsive:true,maintainAspectRatio:false}});
+  });
+
+  // interactions
+  document.querySelectorAll('.rule-toggle').forEach(t=>t.addEventListener('click',()=>t.classList.toggle('off')));
+  document.querySelectorAll('.task-check').forEach(t=>t.addEventListener('click',()=>t.classList.toggle('done')));
+  document.querySelectorAll('.tabs').forEach(tbs => {
+    tbs.querySelectorAll('button').forEach(b => b.addEventListener('click',()=>{
+      tbs.querySelectorAll('button').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+    }));
+  });
+  document.querySelectorAll('.filter-chip').forEach(c=>c.addEventListener('click',()=>{
+    const siblings = c.parentElement.querySelectorAll('.filter-chip');
+    if (c.classList.contains('active')) return;
+    if (c.textContent.trim().length < 14) { siblings.forEach(s=>s.classList.remove('active')); c.classList.add('active'); } else { c.classList.toggle('active'); }
+  }));
+  document.querySelectorAll('.lang-toggle').forEach(lt => {
+    lt.querySelectorAll('span').forEach(s => s.addEventListener('click',()=>{
+      lt.querySelectorAll('span').forEach(x=>x.classList.remove('active')); s.classList.add('active');
+    }));
+  });
+  document.querySelectorAll('.vet-patient').forEach(p => p.addEventListener('click',()=>{
+    document.querySelectorAll('.vet-patient').forEach(x=>x.classList.remove('selected')); p.classList.add('selected');
+  }));
+</script>
+</body>
+</html>

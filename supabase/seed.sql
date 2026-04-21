@@ -1,0 +1,16 @@
+-- Seeds run on `supabase db reset` for local dev.
+-- The main seed (species, breeds, crops, subsidy schemes) is in migration
+-- 13_seed_reference_data.sql. This file is reserved for per-developer
+-- placeholder data (e.g. a demo farm + demo animal) if you want fixtures.
+
+-- To add a demo farm, uncomment and replace the auth UUID with a local one
+-- after running `supabase start` and signing up once.
+--
+-- insert into public.orgs (id, name, owner_id)
+-- values ('11111111-1111-1111-1111-111111111111', 'FarmHeaven Demo Org', '<auth-user-id>');
+-- insert into public.farms (id, org_id, name, slug, total_acres)
+-- values ('22222222-2222-2222-2222-222222222222',
+--         '11111111-1111-1111-1111-111111111111',
+--         'FarmHeaven Demo · Hyderabad', 'farmheaven-demo', 72);
+-- insert into public.memberships (farm_id, user_id, role, accepted_at)
+-- values ('22222222-2222-2222-2222-222222222222', '<auth-user-id>', 'owner', now());
