@@ -16,6 +16,9 @@ node_modules/
 out/
 dist/
 build/
+
+# TypeScript incremental build cache (regenerated on every tsc run)
+*.tsbuildinfo
 .env
 .env.local
 .env.development.local
