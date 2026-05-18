@@ -3238,6 +3238,7 @@ export type Database = {
           email: string | null
           full_name: string
           id: string
+          is_super_admin: boolean
           metadata: Json
           phone: string | null
           preferred_lang: string
@@ -3249,6 +3250,7 @@ export type Database = {
           email?: string | null
           full_name: string
           id: string
+          is_super_admin?: boolean
           metadata?: Json
           phone?: string | null
           preferred_lang?: string
@@ -3260,6 +3262,7 @@ export type Database = {
           email?: string | null
           full_name?: string
           id?: string
+          is_super_admin?: boolean
           metadata?: Json
           phone?: string | null
           preferred_lang?: string
