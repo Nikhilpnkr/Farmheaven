@@ -33,6 +33,14 @@ function jsonError(status: number, message: string): Response {
   );
 }
 
+// India-only. Strip all non-digits, take the last 10, prepend +91.
+// Handles "+919876543210", "919876543210", "9876543210", "+91 98765 43210".
+function normalizeIndianPhone(raw: string): string | null {
+  const digits = raw.replace(/\D/g, '');
+  if (digits.length < 10) return null;
+  return `+91${digits.slice(-10)}`;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method !== 'POST') {
     return jsonError(405, 'Method not allowed');
@@ -59,14 +67,27 @@ Deno.serve(async (req: Request) => {
     return jsonError(401, 'Invalid webhook signature');
   }
 
-  const phone = event.user?.phone;
+  const rawPhone = event.user?.phone;
   const otp = event.sms?.otp;
 
-  if (!phone || !otp) {
-    console.error('Hook payload missing phone or otp', { hasPhone: Boolean(phone), hasOtp: Boolean(otp) });
+  if (!rawPhone || !otp) {
+    console.error('Hook payload missing phone or otp', {
+      hasPhone: Boolean(rawPhone),
+      hasOtp: Boolean(otp),
+    });
     return jsonError(400, 'Hook payload missing phone or otp');
   }
 
+  const phone = normalizeIndianPhone(rawPhone);
+  if (!phone) {
+    console.error('Invalid phone format', { rawPhone });
+    return jsonError(400, 'Invalid phone format');
+  }
+
+  // Keep message ASCII-only so it stays GSM-7 (160 chars/segment) instead of
+  // UCS-2 (70 chars/segment, 2-3x cost). No Rs/INR symbols, em-dashes, smart
+  // quotes, or other Unicode here. If the template grows past 160 chars it
+  // becomes multi-segment (153 chars/segment) and cost rises proportionally.
   const message = `Your FarmHeaven code is ${otp}. Valid for 5 minutes. Do not share.`;
 
   const url = `https://api.textbee.dev/api/v1/gateway/devices/${textbeeDeviceId}/send-sms`;
