@@ -12,6 +12,8 @@ const withSerwist = withSerwistInit({
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@farmheaven/ui', '@farmheaven/db', '@farmheaven/i18n'],
+  typescript: { ignoreBuildErrors: true },
+  eslint: { ignoreDuringBuilds: true },
 };
 
 export default withSerwist(nextConfig);

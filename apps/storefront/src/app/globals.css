@@ -1,1 +1,74 @@
-@import '@farmheaven/ui/styles/globals.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 43 48% 96%;
+    --foreground: 28 23% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 28 23% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 28 23% 10%;
+    --primary: 123 35% 36%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 33 50% 92%;
+    --secondary-foreground: 24 50% 24%;
+    --muted: 43 40% 91%;
+    --muted-foreground: 33 12% 38%;
+    --accent: 43 40% 91%;
+    --accent-foreground: 28 23% 10%;
+    --destructive: 0 65% 47%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 43 25% 85%;
+    --input: 43 25% 85%;
+    --ring: 123 35% 36%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 28 14% 8%;
+    --foreground: 43 34% 93%;
+    --card: 28 10% 12%;
+    --card-foreground: 43 34% 93%;
+    --popover: 28 10% 12%;
+    --popover-foreground: 43 34% 93%;
+    --primary: 124 30% 57%;
+    --primary-foreground: 28 23% 10%;
+    --secondary: 33 14% 18%;
+    --secondary-foreground: 43 34% 93%;
+    --muted: 28 10% 16%;
+    --muted-foreground: 43 18% 65%;
+    --accent: 33 14% 18%;
+    --accent-foreground: 43 34% 93%;
+    --destructive: 0 50% 55%;
+    --destructive-foreground: 43 34% 93%;
+    --border: 28 10% 24%;
+    --input: 28 10% 24%;
+    --ring: 124 30% 57%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  @media (max-width: 640px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+}
