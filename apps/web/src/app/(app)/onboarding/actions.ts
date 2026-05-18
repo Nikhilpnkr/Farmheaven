@@ -1,8 +1,11 @@
 'use server';
 
 import { createClient } from '@farmheaven/db/server';
+import type { Database } from '@farmheaven/db';
 import { farmOnboardingSchema, type FarmOnboardingInput } from '@farmheaven/db/schemas';
 import { revalidatePath } from 'next/cache';
+
+type BootstrapFarmArgs = Database['public']['Functions']['bootstrap_farm']['Args'];
 
 export async function createFarm(input: FarmOnboardingInput) {
   const parsed = farmOnboardingSchema.safeParse(input);
@@ -20,65 +23,32 @@ export async function createFarm(input: FarmOnboardingInput) {
 
   const data = parsed.data;
 
-  // Ensure profile row exists (trigger handles this on signup, but defensive).
-  await supabase
-    .from('profiles')
-    .upsert({
-      id: user.id,
-      full_name: user.user_metadata?.full_name ?? user.phone ?? 'Owner',
-      phone: user.phone ?? null,
-      email: user.email ?? null,
-    })
-    .select()
-    .single();
+  const args: BootstrapFarmArgs = {
+    _org_name: data.org_name,
+    _farm_name: data.farm_name,
+    _slug: data.slug,
+    _total_acres: data.total_acres,
+    _address_line: data.address_line,
+    _pincode: data.pincode,
+    _state: data.state,
+    _country: data.country,
+    _latitude: data.latitude,
+    _longitude: data.longitude,
+  };
 
-  // Org
-  const { data: org, error: orgErr } = await supabase
-    .from('orgs')
-    .insert({ name: data.org_name, owner_id: user.id })
-    .select('id')
-    .single();
-  if (orgErr || !org) {
-    return { error: orgErr?.message ?? 'Failed to create organisation' };
-  }
+  // supabase-js 2.105.x has broken rpc<FnName, Args> inference: Args defaults
+  // to `never`, so `args?: Args` collapses to `undefined` and a real args
+  // object is rejected at compile time. The `as never` cast lets the call
+  // typecheck; runtime is unaffected because `args` is validated above.
+  const { data: farmId, error } = await supabase.rpc('bootstrap_farm', args as never);
 
-  // Farm
-  const locationWkt =
-    data.latitude != null && data.longitude != null
-      ? `POINT(${data.longitude} ${data.latitude})`
-      : null;
-
-  const { data: farm, error: farmErr } = await supabase
-    .from('farms')
-    .insert({
-      org_id: org.id,
-      name: data.farm_name,
-      slug: data.slug,
-      total_acres: data.total_acres,
-      address_line: data.address_line ?? null,
-      pincode: data.pincode ?? null,
-      state: data.state,
-      country: data.country,
-      location_geom: locationWkt,
-    })
-    .select('id')
-    .single();
-  if (farmErr || !farm) {
-    return { error: farmErr?.message ?? 'Failed to create farm' };
-  }
-
-  // Membership
-  const { error: memErr } = await supabase.from('memberships').insert({
-    farm_id: farm.id,
-    user_id: user.id,
-    role: 'owner',
-    is_active: true,
-    accepted_at: new Date().toISOString(),
-  });
-  if (memErr) {
-    return { error: memErr.message };
+  if (error) {
+    if (error.message === 'slug_taken') {
+      return { error: 'That slug is already taken. Try another.' };
+    }
+    return { error: error.message };
   }
 
   revalidatePath('/', 'layout');
-  return { ok: true as const, farmId: farm.id };
+  return { ok: true as const, farmId: farmId as string };
 }

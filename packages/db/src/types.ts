@@ -5106,6 +5106,21 @@ export type Database = {
             }
             Returns: string
           }
+      bootstrap_farm: {
+        Args: {
+          _address_line?: string
+          _country?: string
+          _farm_name: string
+          _latitude?: number
+          _longitude?: number
+          _org_name: string
+          _pincode?: string
+          _slug: string
+          _state?: string
+          _total_acres: number
+        }
+        Returns: string
+      }
       current_farm_id: { Args: never; Returns: string }
       disablelongtransactions: { Args: never; Returns: string }
       dropgeometrycolumn:
