@@ -43,3 +43,7 @@ src/types/database.ts
 *.bak
 *.backup
 *.dump
+
+# Sentry
+.env.sentry-build-plugin
+.sentryclirc
