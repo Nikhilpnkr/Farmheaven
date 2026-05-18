@@ -58,9 +58,16 @@ Deno.serve(async (req: Request) => {
   const payload = await req.text();
   const headers = Object.fromEntries(req.headers);
 
+  // Supabase stores the hook secret as `v1,whsec_<base64>` but the
+  // standardwebhooks library expects just the base64 part. Strip the prefix
+  // defensively (no-op if it's already stripped).
+  const normalizedSecret = hookSecret.startsWith('v1,whsec_')
+    ? hookSecret.slice('v1,whsec_'.length)
+    : hookSecret.replace(/^v1,/, '');
+
   let event: SendSmsPayload;
   try {
-    const wh = new Webhook(hookSecret);
+    const wh = new Webhook(normalizedSecret);
     event = wh.verify(payload, headers) as SendSmsPayload;
   } catch (err) {
     console.error('Invalid webhook signature', err);
