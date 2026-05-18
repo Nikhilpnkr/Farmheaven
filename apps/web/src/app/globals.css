@@ -4,48 +4,93 @@
 
 @layer base {
   :root {
-    --background: 43 48% 96%;
-    --foreground: 28 23% 10%;
+    /* Surfaces — cool near-neutral */
+    --background: 160 6% 97%; /* #F7F8F8 cool canvas */
+    --foreground: 160 14% 5%; /* #0B0F0E near-black */
     --card: 0 0% 100%;
-    --card-foreground: 28 23% 10%;
+    --card-foreground: 160 14% 5%;
     --popover: 0 0% 100%;
-    --popover-foreground: 28 23% 10%;
-    --primary: 123 35% 36%;
+    --popover-foreground: 160 14% 5%;
+
+    /* Brand — saturated emerald */
+    --primary: 160 84% 24%; /* #047857 emerald-700 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 33 50% 92%;
-    --secondary-foreground: 24 50% 24%;
-    --muted: 43 40% 91%;
-    --muted-foreground: 33 12% 38%;
-    --accent: 43 40% 91%;
-    --accent-foreground: 28 23% 10%;
-    --destructive: 0 65% 47%;
+
+    /* Secondary — very subtle cool grey, not brown */
+    --secondary: 160 7% 95%; /* #F0F2F1 */
+    --secondary-foreground: 160 14% 5%;
+
+    --muted: 160 7% 95%;
+    --muted-foreground: 160 6% 38%; /* #5C6360 */
+
+    /* Accent — sharper amber */
+    --accent: 38 92% 50%; /* #F59E0B amber-500 */
+    --accent-foreground: 30 25% 12%;
+
+    /* Semantic — saturated, single hue per status */
+    --destructive: 0 72% 51%; /* #DC2626 red-600 */
     --destructive-foreground: 0 0% 100%;
-    --border: 43 25% 85%;
-    --input: 43 25% 85%;
-    --ring: 123 35% 36%;
-    --radius: 0.5rem;
+    --success: 160 84% 30%; /* #059669 emerald-600 */
+    --success-foreground: 0 0% 100%;
+    --warning: 33 92% 44%; /* #D97706 amber-600 */
+    --warning-foreground: 0 0% 100%;
+    --info: 217 91% 50%; /* #2563EB blue-600 */
+    --info-foreground: 0 0% 100%;
+
+    /* Borders — barely there */
+    --border: 160 6% 90%; /* #E4E7E6 */
+    --input: 160 6% 88%; /* #DDE1DF slightly stronger for input outlines */
+    --ring: 160 84% 24%;
+
+    /* Charts — minimal 5-color set, all saturated */
+    --chart-1: 160 84% 24%; /* emerald */
+    --chart-2: 38 92% 50%; /* amber */
+    --chart-3: 217 91% 50%; /* blue */
+    --chart-4: 0 72% 51%; /* red */
+    --chart-5: 271 76% 53%; /* violet — 5th series */
+
+    --radius: 0.5rem; /* 8px — tighter, more minimal */
   }
 
   .dark {
-    --background: 28 14% 8%;
-    --foreground: 43 34% 93%;
-    --card: 28 10% 12%;
-    --card-foreground: 43 34% 93%;
-    --popover: 28 10% 12%;
-    --popover-foreground: 43 34% 93%;
-    --primary: 124 30% 57%;
-    --primary-foreground: 28 23% 10%;
-    --secondary: 33 14% 18%;
-    --secondary-foreground: 43 34% 93%;
-    --muted: 28 10% 16%;
-    --muted-foreground: 43 18% 65%;
-    --accent: 33 14% 18%;
-    --accent-foreground: 43 34% 93%;
-    --destructive: 0 50% 55%;
-    --destructive-foreground: 43 34% 93%;
-    --border: 28 10% 24%;
-    --input: 28 10% 24%;
-    --ring: 124 30% 57%;
+    --background: 160 12% 4%; /* #0A0C0B near-black */
+    --foreground: 160 6% 96%; /* #F4F6F5 */
+    --card: 160 14% 7%; /* #11140F */
+    --card-foreground: 160 6% 96%;
+    --popover: 160 14% 7%;
+    --popover-foreground: 160 6% 96%;
+
+    /* Brand lifted for dark */
+    --primary: 160 84% 39%; /* #10B981 emerald-500 */
+    --primary-foreground: 160 12% 4%;
+
+    --secondary: 160 10% 10%; /* #1A1F1C */
+    --secondary-foreground: 160 6% 96%;
+
+    --muted: 160 10% 10%;
+    --muted-foreground: 160 5% 56%; /* #8A918E */
+
+    --accent: 38 92% 60%; /* #FBBF24 amber-400 */
+    --accent-foreground: 160 12% 4%;
+
+    --destructive: 0 91% 65%; /* #F87171 red-400 */
+    --destructive-foreground: 160 12% 4%;
+    --success: 160 84% 45%; /* #34D399 emerald-400 */
+    --success-foreground: 160 12% 4%;
+    --warning: 38 92% 60%;
+    --warning-foreground: 160 12% 4%;
+    --info: 217 91% 65%; /* #60A5FA blue-400 */
+    --info-foreground: 160 12% 4%;
+
+    --border: 160 10% 16%; /* #1F2422 */
+    --input: 160 10% 18%; /* #2C322F */
+    --ring: 160 84% 39%;
+
+    --chart-1: 160 84% 45%;
+    --chart-2: 38 92% 60%;
+    --chart-3: 217 91% 65%;
+    --chart-4: 0 91% 65%;
+    --chart-5: 271 76% 70%;
   }
 }
 
@@ -61,7 +106,7 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-feature-settings: 'rlig' 1, 'calt' 1, 'ss01' 1;
   }
 
   @media (max-width: 640px) {

@@ -3,17 +3,20 @@ import type * as React from 'react';
 import { cn } from '../../lib/utils';
 
 const badgeVariants = cva(
-  'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors',
+  'inline-flex items-center gap-1 rounded border px-2.5 py-0.5 text-xs font-medium transition-colors',
   {
     variants: {
       variant: {
-        default: 'bg-primary/10 text-primary',
-        secondary: 'bg-secondary text-secondary-foreground',
-        destructive: 'bg-destructive/10 text-destructive',
-        outline: 'border border-border text-foreground',
-        success: 'bg-leaf-50 text-leaf-600',
-        warning: 'bg-turmeric-50 text-soil-700',
-        cert: 'bg-leaf-50 text-leaf-600',
+        default: 'border-transparent bg-primary text-primary-foreground',
+        secondary: 'border-transparent bg-secondary text-secondary-foreground',
+        destructive:
+          'border-transparent bg-red-100 text-red-900 dark:bg-red-950 dark:text-red-300',
+        outline: 'border-border text-foreground',
+        success:
+          'border-transparent bg-emerald-50 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300',
+        warning:
+          'border-transparent bg-amber-50 text-amber-900 dark:bg-amber-950 dark:text-amber-300',
+        info: 'border-transparent bg-blue-50 text-blue-900 dark:bg-blue-950 dark:text-blue-300',
       },
     },
     defaultVariants: { variant: 'default' },
@@ -27,3 +30,5 @@ export interface BadgeProps
 export function Badge({ className, variant, ...props }: BadgeProps) {
   return <div className={cn(badgeVariants({ variant }), className)} {...props} />;
 }
+
+export { badgeVariants };
