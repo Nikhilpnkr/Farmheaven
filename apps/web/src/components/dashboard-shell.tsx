@@ -23,6 +23,7 @@ import { Sidebar, type SidebarSection } from '@farmheaven/ui/components/app/side
 import { Topbar } from '@farmheaven/ui/components/app/topbar';
 import { KpiCard } from '@farmheaven/ui/components/app/kpi-card';
 import { Button } from '@farmheaven/ui/components/ui/button';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { signOut } from '@/app/login/actions';
 
 interface Props {
@@ -101,6 +102,7 @@ export function DashboardShell({ user }: Props) {
           onLangChange={setLang}
           weather={{ temp: '34°C', label: 'Partly cloudy' }}
           alertCount={1}
+          actions={<ThemeToggle />}
         />
 
         <main className="mx-auto w-full max-w-[1600px] p-6">

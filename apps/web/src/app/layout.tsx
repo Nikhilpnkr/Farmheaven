@@ -4,6 +4,7 @@ import { getLocale, getMessages } from 'next-intl/server';
 import { Fraunces, Inter, JetBrains_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
 
+import { ThemeProvider } from '@/components/theme-provider';
 import './globals.css';
 
 const inter = Inter({
@@ -43,12 +44,23 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={`${inter.variable} ${fraunces.variable} ${mono.variable}`}>
+    <html
+      lang={locale}
+      suppressHydrationWarning
+      className={`${inter.variable} ${fraunces.variable} ${mono.variable}`}
+    >
       <body>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
-          <Toaster position="bottom-right" richColors />
-        </NextIntlClientProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            {children}
+            <Toaster position="bottom-right" richColors />
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

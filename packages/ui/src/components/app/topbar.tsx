@@ -1,6 +1,7 @@
 'use client';
 
 import { Bell, LifeBuoy, MessageCircle, Search } from 'lucide-react';
+import type * as React from 'react';
 import { cn } from '../../lib/utils';
 import { LangToggle } from './lang-toggle';
 
@@ -9,10 +10,15 @@ interface TopbarProps {
   onLangChange: (v: 'en' | 'te' | 'hi') => void;
   weather?: { temp: string; label: string };
   alertCount?: number;
+  /**
+   * Optional slot for additional controls rendered between the weather chip
+   * and the bell button. Typically used for the theme toggle.
+   */
+  actions?: React.ReactNode;
   className?: string;
 }
 
-export function Topbar({ lang, onLangChange, weather, alertCount, className }: TopbarProps) {
+export function Topbar({ lang, onLangChange, weather, alertCount, actions, className }: TopbarProps) {
   return (
     <div
       className={cn(
@@ -41,6 +47,8 @@ export function Topbar({ lang, onLangChange, weather, alertCount, className }: T
           <span className="text-muted-foreground">{weather.label}</span>
         </div>
       ) : null}
+
+      {actions}
 
       <button
         type="button"
