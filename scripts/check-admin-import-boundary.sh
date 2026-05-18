@@ -8,11 +8,13 @@ set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
 # Search for any import of admin.ts outside the (admin) route group.
-# Allowed locations:
-#   apps/web/src/app/(admin)/**            — the admin route itself
-#   packages/db/src/admin.ts               — the client lives here
-#   packages/db/src/index.ts               — package barrel may re-export
-#   scripts/check-admin-import-boundary.sh — this script
+# Allowed locations (matched by the grep -v filters below):
+#   apps/web/src/app/(admin)/**  — the admin route itself
+#   packages/db/src/admin.ts     — the client lives here
+#   packages/db/src/index.ts     — package barrel may re-export
+# Note: this script lives under scripts/ but is never scanned (grep root
+# is apps/ packages/ only). Mentions of createAdminClient in this file's
+# comments don't trip the check.
 VIOLATIONS=$(
   grep -RIn --include='*.ts' --include='*.tsx' \
     --exclude-dir=node_modules \

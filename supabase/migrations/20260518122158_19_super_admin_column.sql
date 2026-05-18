@@ -5,7 +5,8 @@
 alter table public.profiles
   add column is_super_admin boolean not null default false;
 
--- Partial index so the middleware lookup stays cheap even as profiles grows.
--- Only the (small) set of super_admin rows is indexed.
+-- Partial index serving the last-super_admin guard count query in
+-- actions.ts (select count(*) where is_super_admin = true). The middleware
+-- lookup uses the primary key directly, not this index.
 create index if not exists profiles_is_super_admin_idx
   on public.profiles (id) where is_super_admin = true;

@@ -12,7 +12,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   await assertSuperAdmin();
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
+    // Hard-coded dark palette: admin should look distinctly different
+    // regardless of the user's theme preference (intentional override).
+    <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-100">
       {/* Topbar */}
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-zinc-800 bg-zinc-900 px-6 py-3">
         <div className="flex items-center gap-2">
@@ -23,15 +25,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </div>
         <Link
           href="/dashboard"
-          className="text-sm text-zinc-400 hover:text-zinc-100"
+          className="text-sm text-zinc-400 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
         >
           Exit admin →
         </Link>
       </header>
 
-      <div className="flex">
+      <div className="flex flex-1">
         {/* Sidebar */}
-        <nav className="min-h-[calc(100vh-49px)] w-56 shrink-0 border-r border-zinc-800 bg-zinc-900/50 px-3 py-4">
+        <nav className="w-56 shrink-0 border-r border-zinc-800 bg-zinc-900/50 px-3 py-4">
           {ADMIN_GROUPS.map((group) => (
             <div key={group.label} className="mb-4">
               <div className="mb-1 px-2 text-[10px] uppercase tracking-wider text-zinc-500">
@@ -42,7 +44,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                   <li key={t.name}>
                     <Link
                       href={`/admin/${t.name}`}
-                      className="block rounded px-2 py-1 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+                      className="block rounded px-2 py-1 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
                     >
                       {t.label}
                     </Link>
