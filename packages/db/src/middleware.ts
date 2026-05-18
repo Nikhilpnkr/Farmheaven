@@ -30,7 +30,7 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  return { response, user };
+  return { response, user, supabase };
 }
 
 // Gate an app behind auth. Returns a redirect response if unauthorized.

@@ -27,7 +27,7 @@ function startsWith(pathname: string, prefixes: string[]) {
 }
 
 export async function middleware(request: NextRequest) {
-  const { response, user } = await updateSession(request);
+  const { response, user, supabase } = await updateSession(request);
   const pathname = request.nextUrl.pathname;
 
   const isStorefront = pathname === '/' || startsWith(pathname, PUBLIC_PREFIXES);
@@ -51,6 +51,24 @@ export async function middleware(request: NextRequest) {
     url.pathname = '/login';
     url.searchParams.set('next', pathname);
     return NextResponse.redirect(url);
+  }
+
+  // /admin/* requires profiles.is_super_admin. 404 (not 403) so the route's
+  // existence isn't disclosed to non-admins. RLS allows users to read their
+  // own profile row via profiles_self_read, so no service-role here.
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    // Cast around supabase-js 2.105.x + @supabase/ssr 0.5.x version-skew
+    // type inference defect on .select(); see admin-client.ts for the same pattern.
+    type ProfileLookupRow = { is_super_admin: boolean | null };
+    const { data } = await supabase
+      .from('profiles')
+      .select('is_super_admin')
+      .eq('id', user.id)
+      .single();
+    const profile = data as ProfileLookupRow | null;
+    if (!profile?.is_super_admin) {
+      return NextResponse.rewrite(new URL('/404', request.url));
+    }
   }
 
   return response;
