@@ -3,6 +3,5 @@
   "framework": "nextjs",
   "buildCommand": "cd ../.. && pnpm turbo run build --filter=@farmheaven/storefront...",
   "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
-  "outputDirectory": ".next",
-  "ignoreCommand": "cd ../.. && pnpm turbo-ignore @farmheaven/storefront || exit 1"
+  "outputDirectory": ".next"
 }
