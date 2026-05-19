@@ -30,6 +30,9 @@ jobs:
       - name: Biome check (lint + format)
         run: pnpm check
 
+      - name: Admin import boundary
+        run: bash scripts/check-admin-import-boundary.sh
+
       - name: Typecheck
         run: pnpm turbo typecheck
 
