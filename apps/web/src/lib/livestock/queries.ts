@@ -96,7 +96,7 @@ export async function listAnimals(
   query = query.eq('farm_id', farmId);
   if (!includeRetired) query = query.is('retired_at', null);
   if (species) query = query.eq('species_code', species);
-  if (search && search.trim()) {
+  if (search?.trim()) {
     const pattern = `%${search.trim().replace(/[%_]/g, '\\$&')}%`;
     query = query.or(`tag.ilike.${pattern},name.ilike.${pattern}`);
   }

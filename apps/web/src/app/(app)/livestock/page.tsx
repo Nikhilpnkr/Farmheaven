@@ -57,7 +57,7 @@ export default async function LivestockPage({
   if (!farmId) redirect('/onboarding');
 
   const sp = await searchParams;
-  const page = Math.max(1, parseInt(sp.page ?? '1', 10) || 1);
+  const page = Math.max(1, Number.parseInt(sp.page ?? '1', 10) || 1);
   const search = (sp.q ?? '').trim();
   const speciesFilter = sp.species && sp.species !== 'all' ? sp.species : undefined;
   const includeRetired = sp.retired === '1';
