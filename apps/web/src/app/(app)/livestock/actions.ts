@@ -12,7 +12,7 @@ type Result = { ok: true; id: string } | { ok: false; error: string };
 export async function createAnimal(input: unknown): Promise<Result> {
   const parsed = animalRegistrationSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.errors[0]?.message ?? 'invalid_input' };
+    return { ok: false, error: 'invalid_input' };
   }
 
   const supabase = await createClient();

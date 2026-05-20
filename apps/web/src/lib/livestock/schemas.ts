@@ -14,10 +14,19 @@ export const animalRegistrationSchema = z.object({
   tag: z.string().min(1, 'Tag is required').max(40),
   name: z.string().max(80).optional(),
   species_code: z.enum(['cattle', 'buffalo', 'goat', 'sheep', 'poultry', 'fish', 'bee']),
-  breed_id: z.string().uuid().optional(),
+  breed_id: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.string().uuid().optional(),
+  ),
   sex: z.enum(['male', 'female', 'unknown']).default('unknown'),
-  date_of_birth: z.string().date().optional(),
-  current_structure_id: z.string().uuid().optional(),
+  date_of_birth: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.string().date().optional(),
+  ),
+  current_structure_id: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.string().uuid().optional(),
+  ),
   acquisition_kind: z.enum(['born_onfarm', 'purchased', 'gifted', 'transferred']).default('born_onfarm'),
 });
 
