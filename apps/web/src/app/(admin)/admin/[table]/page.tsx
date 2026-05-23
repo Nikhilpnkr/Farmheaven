@@ -125,7 +125,7 @@ export default async function TableListPage({
           </TableHeader>
           <TableBody>
             {rows.map((row, i) => {
-              const id = String(row['id'] ?? row['code'] ?? i);
+              const id = String(row.id ?? row.code ?? i);
               return (
                 <TableRow key={id} className="border-zinc-800 hover:bg-zinc-900/50">
                   {config.listColumns.map((col) => (

@@ -6,6 +6,7 @@
 // If you're reaching for this from a normal request, you probably want server.ts.
 
 import { createClient as createPlain } from '@supabase/supabase-js';
+import { requireEnv } from './env';
 import type { Database } from './types';
 
 export function createAdminClient() {
@@ -15,7 +16,7 @@ export function createAdminClient() {
       'SUPABASE_SERVICE_ROLE_KEY is not set. This client must never run in the browser.',
     );
   }
-  return createPlain<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, key, {
+  return createPlain<Database>(requireEnv('NEXT_PUBLIC_SUPABASE_URL'), key, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }

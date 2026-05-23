@@ -36,8 +36,6 @@
     "vitest": "^3"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx,json}": [
-      "biome format --write"
-    ]
+    "*.{ts,tsx,js,jsx,json}": ["biome format --write"]
   }
 }

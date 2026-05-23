@@ -37,8 +37,9 @@ export async function updateRow(
   // We keep the original `id` (which is the value of pkColumn, not necessarily 'id')
   // as the WHERE target. Drop both 'id' and pkColumn to be safe in case the row
   // had both (e.g. a table with 'code' as PK but an 'id' column that's not the PK).
-  delete parsed.id;
-  delete parsed[pkColumn];
+  // Use Object.fromEntries + filter rather than `delete` so V8 doesn't bail on
+  // the hidden-class fast path (biome lint/performance/noDelete).
+  parsed = Object.fromEntries(Object.entries(parsed).filter(([k]) => k !== 'id' && k !== pkColumn));
 
   const admin = createAdminClient();
 

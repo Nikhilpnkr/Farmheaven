@@ -2,6 +2,7 @@
 // Refreshes the session cookie on every request so expired tokens don't leak through.
 import { type CookieOptions, createServerClient } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
+import { requireEnv } from './env';
 import type { Database } from './types';
 
 type CookieWrite = { name: string; value: string; options?: CookieOptions };
@@ -10,8 +11,8 @@ export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    requireEnv('NEXT_PUBLIC_SUPABASE_URL'),
+    requireEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY'),
     {
       cookies: {
         getAll: () => request.cookies.getAll(),

@@ -2,6 +2,7 @@
 // Reads/writes cookies via next/headers so session state stays in sync.
 import { type CookieOptions, createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { requireEnv } from './env';
 import type { Database } from './types';
 
 type CookieWrite = { name: string; value: string; options?: CookieOptions };
@@ -10,8 +11,8 @@ export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    requireEnv('NEXT_PUBLIC_SUPABASE_URL'),
+    requireEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY'),
     {
       cookies: {
         getAll: () => cookieStore.getAll(),

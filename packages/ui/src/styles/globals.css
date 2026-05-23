@@ -1,8 +1,11 @@
+/* CSS @import rules must precede other rules (CSS spec).
+   tokens.css declares the design-token CSS variables that the @tailwind
+   layers compose against, so it has to load first. */
+@import "./tokens.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import "./tokens.css";
 
 @layer base {
   * {
