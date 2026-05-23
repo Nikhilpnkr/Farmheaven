@@ -50,3 +50,4 @@ src/types/database.ts
 # Sentry
 .env.sentry-build-plugin
 .sentryclirc
+.claude/settings.local.json

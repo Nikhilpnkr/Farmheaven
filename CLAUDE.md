@@ -1,0 +1,143 @@
+# FarmHeaven — Project Rules for Claude Code
+
+> Read this before touching code. These are non-negotiable.
+
+## Stack
+
+Single Next.js 15 app at `apps/web`, route groups: `(app)` farmer console, `(admin)` super-admin, `(storefront)` public customer site. pnpm + turborepo monorepo. React 19. TypeScript strict. Tailwind 3.4 + shadcn/ui. Supabase (raw `@supabase/ssr` client + generated types — **NO Drizzle**, despite what older docs say). React Hook Form + Zod. TanStack Query for client cache, nuqs for URL state. Biome for lint+format. Sentry for errors/tracing/replay. Razorpay for payments. date-fns for dates.
+
+## Non-negotiables
+
+### 1. Mobile-first, always
+
+Every page must be designed at **375px first**, then scale up. The farmer logs milk on a phone in a cowshed; the customer scans a QR on a phone. Desktop is a side-effect of doing mobile right.
+
+- **Tap targets**: minimum 44×44px (iOS HIG). Use shadcn `size="lg"` or `size="icon"` defaults; never go smaller than `h-10 w-10`.
+- **No horizontal scroll** anywhere except intentional carousels. Verify at 375px and 320px.
+- **Forms**: one column on mobile, two-column only ≥ `md:`. Inputs `text-base` minimum (prevents iOS zoom-on-focus). `inputMode` + `autoComplete` on every input (`numeric`, `decimal`, `tel`, `email`).
+- **Tables**: never render raw `<table>` on mobile. Use card list at `< md`, table at `≥ md`. Build this as a shared pattern, not per-page.
+- **Bottom safe area**: respect `env(safe-area-inset-bottom)` for sticky CTAs. Use `pb-[env(safe-area-inset-bottom)]` on fixed-bottom bars.
+- **Sheet over Dialog** on mobile. shadcn `Sheet` with `side="bottom"` is the default modal pattern; `Dialog` only when content is < 1 viewport tall.
+- **Sticky primary action**: any flow with > 1 input has its primary action sticky at the bottom on mobile.
+- **Test on real viewport sizes**: 375 (iPhone SE), 390 (iPhone 14), 412 (Pixel 7), 768 (iPad). Don't skip 375.
+
+### 2. Accessibility is a release blocker
+
+- Every interactive element keyboard-reachable + visible `:focus-visible` ring (Tailwind `focus-visible:ring-2`).
+- Forms: `<Label htmlFor>` on every input; errors announced via `aria-describedby` (shadcn `<FormMessage>` does this).
+- Color contrast ≥ 4.5:1 for text, ≥ 3:1 for UI elements. Verify in both light and dark themes.
+- Images: `alt` is required, not optional. Decorative → `alt=""`. Photo uploads → infer alt from filename or require caption.
+- No color-only signaling — always pair with icon or text.
+
+### 3. Performance budgets
+
+Enforced via Lighthouse CI on every PR (set up if missing — see "Tooling to add").
+
+- **LCP** ≤ 2.5s on mobile 4G (Lighthouse mobile preset).
+- **INP** ≤ 200ms.
+- **CLS** ≤ 0.1.
+- **JS bundle per route** ≤ 200KB gzipped. If a route ships more, lazy-load with `next/dynamic`.
+- **Images**: `next/image` only, never `<img>`. Always set `sizes`. Storefront product photos use `priority` only for above-fold.
+- **Fonts**: `next/font` with `display: 'swap'`, subset to latin. No FOIT.
+- **Server components by default**; client components only for interaction. Annotate `'use client'` reluctantly.
+- **No `useEffect`-on-mount data fetching**. RSC + Server Actions, or TanStack Query with `staleTime`.
+
+### 4. Testing — every PR
+
+The repo has no test framework yet. Adding one is part of going prod-ready (see "Tooling to add"). Once installed, these rules apply:
+
+- **Unit tests** (Vitest): every Zod schema, every pure util in `lib/`, every server action's validation branch.
+- **Integration tests** (Vitest + `@testing-library/react`): every form's happy path + one validation-error path.
+- **E2E tests** (Playwright): the critical paths only — login, register animal, log milk, customer checkout, QR trace page. Run on mobile viewport (Pixel 7) in CI.
+- **No mocking the DB**. Tests hit a Supabase branch DB (per [Supabase MCP `create_branch`](https://supabase.com/docs/guides/cli/branching)). Mocked DB tests are banned — they passed for us before while the real migration broke.
+- **Coverage gate**: 70% statements on `lib/` and `actions/`; UI components are not coverage-gated (visual via Playwright instead).
+- **No `it.skip` / `test.skip` in main**. If a test is broken, fix it or delete it; don't park it.
+
+### 5. Type safety
+
+- `tsc --noEmit` must pass. CI fails on TS errors. No `// @ts-ignore` without a `// reason: ...` next line. `// @ts-expect-error` preferred.
+- No `any`. Use `unknown` and narrow. Biome warns on `noExplicitAny` — keep it warning-clean.
+- DB types are generated: `pnpm db:types`. Never hand-write a `Database` row type.
+- Server action inputs are **always** parsed by a Zod schema before use. Never trust `FormData` directly.
+
+### 6. Security
+
+- **RLS on by default** for every table. New migrations that create a table MUST include policies in the same migration. CI rejects migrations that add a table without `enable row level security`.
+- **`createAdminClient` (service role)** is locked to `app/(admin)/` by the CI guard at [scripts/check-admin-client-usage.sh](scripts/). Don't widen it.
+- **No secrets in client bundles**. `NEXT_PUBLIC_*` is the only public prefix; everything else is server-only.
+- **CSP + security headers** on every response (via `next.config.ts` headers). Storefront pages need stricter CSP than admin.
+- **Input validation**: Zod at every server-action boundary, every API route, every webhook. Razorpay webhooks must verify HMAC signature.
+- **PII minimization**: customer phone/email logged to Sentry only as `user.id`-style hashes, never raw.
+- **Soft-delete only**, per build plan ground rules — `deleted_at` column, never `DELETE FROM`.
+
+### 7. Observability
+
+- **Sentry** is wired; keep it that way. Server actions wrap errors with `Sentry.captureException` before rethrowing. Don't swallow.
+- **Structured logging**: server-side `console.log` is banned outside of `dev`. Use `lib/logger.ts` (add it if missing — `pino`).
+- **Every user-facing error has a toast** (sonner) AND a Sentry event with breadcrumb context.
+
+### 8. SEO + storefront-readiness
+
+- Storefront routes use `generateMetadata`. Title + description + OG image + canonical URL on every page.
+- `next-sitemap` auto-generates `sitemap.xml` on build. `/trace/[slug]` pages MUST be in the sitemap (they're the traffic funnel).
+- `/trace/[slug]` renders fully SSR — no `'use client'` at the root, no Suspense fallbacks above the fold. JSON-LD `Product` + `Organization` structured data.
+- robots.txt allows storefront + trace pages, disallows `(app)/*` and `(admin)/*`.
+
+## Commands (verification gates)
+
+Before claiming a task is done, every one of these must pass:
+
+```bash
+pnpm typecheck       # turbo across workspaces
+pnpm check           # biome lint + format check
+pnpm --filter @farmheaven/web build   # next build must succeed
+pnpm test            # once vitest is installed
+pnpm e2e             # once playwright is installed; mobile viewport
+```
+
+For a UI change, also: open the dev server, drive the change in Chrome devtools mobile emulation (Pixel 7 + iPhone SE), take a screenshot, confirm no console errors, confirm no horizontal scroll.
+
+## Tooling to add (prod-readiness checklist)
+
+These are missing right now. Each is a small PR.
+
+- [ ] **Vitest** + `@testing-library/react` + `@testing-library/jest-dom`. Config in `apps/web/vitest.config.ts`. Wire `pnpm test` at root via turbo.
+- [ ] **Playwright** with mobile project (Pixel 7) + desktop project. Smoke suite covers login, register animal, log milk, checkout, trace page. CI runs on PR.
+- [ ] **Lighthouse CI** GitHub Action on every PR. Mobile preset. Budget file in `.lighthouserc.json`. Hard-fail thresholds: LCP 2.5s, INP 200ms, CLS 0.1.
+- [ ] **`@axe-core/playwright`** integration — every E2E test ends with `await checkA11y(page)`. Zero serious/critical issues.
+- [ ] **`@next/bundle-analyzer`** behind `ANALYZE=true`. Add `pnpm analyze` script. Review on every dependency change.
+- [ ] **Sentry source maps** uploaded on build (already wired? verify in `next.config.ts`).
+- [ ] **PostHog** (or alternative) for product analytics — events for: animal registered, milk logged, product added to cart, checkout completed, QR scanned. Opt-out for storefront customers.
+- [ ] **`@vercel/og`** for dynamic OG images on `/product/[slug]` and `/trace/[slug]`.
+- [ ] **CSP middleware** with nonce-based script-src. Strict on `(storefront)`, looser on `(app)` if needed.
+- [ ] **Renovate or Dependabot** weekly grouped PRs for deps.
+- [ ] **`pnpm audit --prod`** as a CI step; fail on high/critical.
+- [ ] **Backup automation**: Supabase point-in-time recovery enabled; verify retention ≥ 7 days.
+- [ ] **Error budget**: Sentry release-tracking + alert if error rate > 1% of sessions.
+- [ ] **Status page** stub (`/status` route reading from Supabase health + Vercel API).
+- [ ] **Razorpay webhook signature verification** test cases (replay attack, bad signature, late delivery).
+
+## Commit & PR conventions
+
+- **Author**: Nikhilpnkr only. **Never add a Claude `Co-Authored-By` trailer** on any commit, PR description, or doc. Drop the Anthropic mention from the templates too.
+- Conventional Commits prefix: `feat(scope): …`, `fix(scope): …`, `chore(scope): …`, `docs(...): …`. Scope mirrors module: `livestock`, `admin`, `storefront`, `auth`, `db`, `ci`, `deps`.
+- One logical change per commit. Small commits over huge ones.
+- PR description has: **What**, **Why**, **Verification** (which commands ran, which mobile viewports tested, screenshots for UI). No emoji.
+- Squash-merge to `main` is fine for short branches; `--no-ff` merge to preserve feature branch shape for big features (like `feat/phase-1a-animals`).
+
+## Project-specific conventions
+
+- **Single farm, single tenant.** No `tenant_id`. Queries assume one farm (set at onboarding).
+- **Two auth realms**: farm staff (`profiles` table) and customers (`customers` table). Never mix.
+- **Server components by default**; `'use client'` only for stateful interaction.
+- **Money** = integer paise (₹1.00 = 100). Never floats. Display via formatter, never raw.
+- **Dates** = `timestamptz` UTC, displayed in `Asia/Kolkata`. Use `date-fns-tz` helpers in `lib/date.ts`.
+- **Photos**: Supabase Storage at `farm-media/{entity_type}/{entity_id}/{uuid}.{ext}`. Public bucket for storefront, private for internal. Use `next/image` with the Supabase loader.
+- **Every list view** supports filter + search + sort, URL-driven via `nuqs`.
+- **Every form** is RHF + Zod, schemas in `apps/web/src/lib/<module>/schemas.ts`.
+- **Server actions over API routes** for mutations. API routes only for webhooks and cron.
+- **Build plan**: canonical source at `C:\Users\pc\Downloads\FARMHEAVEN_BUILD_PLAN.md`. v2 plan mentions Drizzle — ignore that part; real schema is the 19-migration Supabase one.
+
+## What NOT to build (parking lot)
+
+Per the v2 plan: no subscriptions, no IoT/MQTT, no multi-tenant, no offline-PWA, no native app, no AI/Whisper features, no Telugu/Hindi i18n (English only in v1), no multi-vendor marketplace, no cold-chain, no map view, no real-time WebSockets (polling is fine). If you find yourself wanting one of these, stop.
