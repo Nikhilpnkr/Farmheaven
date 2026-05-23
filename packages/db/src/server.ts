@@ -1,8 +1,10 @@
 // Supabase client for Server Components, Server Actions, Route Handlers.
 // Reads/writes cookies via next/headers so session state stays in sync.
-import { createServerClient } from '@supabase/ssr';
+import { type CookieOptions, createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import type { Database } from './types';
+
+type CookieWrite = { name: string; value: string; options?: CookieOptions };
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -13,7 +15,7 @@ export async function createClient() {
     {
       cookies: {
         getAll: () => cookieStore.getAll(),
-        setAll: (cookiesToSet) => {
+        setAll: (cookiesToSet: CookieWrite[]) => {
           try {
             for (const { name, value, options } of cookiesToSet) {
               cookieStore.set(name, value, options);

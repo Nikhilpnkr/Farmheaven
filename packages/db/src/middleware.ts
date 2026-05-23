@@ -1,8 +1,10 @@
 // Auth middleware shared across apps. Call from each app's middleware.ts.
 // Refreshes the session cookie on every request so expired tokens don't leak through.
-import { createServerClient } from '@supabase/ssr';
+import { type CookieOptions, createServerClient } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
 import type { Database } from './types';
+
+type CookieWrite = { name: string; value: string; options?: CookieOptions };
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -13,7 +15,7 @@ export async function updateSession(request: NextRequest) {
     {
       cookies: {
         getAll: () => request.cookies.getAll(),
-        setAll: (cookiesToSet) => {
+        setAll: (cookiesToSet: CookieWrite[]) => {
           for (const { name, value } of cookiesToSet) {
             request.cookies.set(name, value);
           }

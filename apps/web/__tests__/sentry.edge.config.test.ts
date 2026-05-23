@@ -22,7 +22,9 @@ describe('sentry.edge.config', () => {
       sendDefaultPii: true,
       enableLogs: true,
     });
-    // Edge runtime can't read local variables; the option should not be set.
-    expect(config?.includeLocalVariables).toBeUndefined();
+    // Edge runtime can't read local variables; VercelEdgeOptions doesn't even
+    // accept includeLocalVariables, so we assert via Object.keys to stay
+    // compatible with the runtime type narrowing.
+    expect(Object.keys(config ?? {})).not.toContain('includeLocalVariables');
   });
 });
