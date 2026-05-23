@@ -147,13 +147,20 @@ Each is a small PR.
 - [ ] **Status page** stub (`/status` route reading from Supabase health + Vercel API).
 - [ ] **Razorpay webhook signature verification** test cases (replay attack, bad signature, late delivery).
 
-## Commit & PR conventions
+## Commit & main-line policy
 
-- **Author**: Nikhilpnkr only. **Never add a Claude `Co-Authored-By` trailer** on any commit, PR description, or doc. Drop the Anthropic mention from the templates too.
-- Conventional Commits prefix: `feat(scope): …`, `fix(scope): …`, `chore(scope): …`, `docs(...): …`. Scope mirrors module: `livestock`, `admin`, `storefront`, `auth`, `db`, `ci`, `deps`.
-- One logical change per commit. Small commits over huge ones.
-- PR description has: **What**, **Why**, **Verification** (which commands ran, which mobile viewports tested, screenshots for UI). No emoji.
-- Squash-merge to `main` is fine for short branches; `--no-ff` merge to preserve feature branch shape for big features (like `feat/phase-1a-animals`).
+Solo developer. **Work happens directly on `main`. Do not create feature branches.**
+
+- **No feature branches.** Don't run `git checkout -b`. Don't open PRs against `main`. The PR-review surface exists for collaboration; with one dev there's no one on the other side of the review. Skip the ceremony.
+- **`git push origin main` IS the deploy command.** Vercel ships every push to production. If the build is red, prod is red. Read this twice.
+- **Verify before push, always.** Without a preview-build gate, the gates only catch breakage after it's already in main. Run the verification gates locally before every push. Anything more involved than a docs change should also get a `pnpm --filter @farmheaven/web build` locally first.
+- **Atomic commits stay the discipline.** One logical change per commit, small commits over huge ones. The value is reversibility (`git revert <sha>`), not diff-review.
+- **Hotfix = revert.** When something breaks production: `git revert <bad-sha> && git push`. No branch needed.
+- **Conventional Commits.** `feat(scope): …`, `fix(scope): …`, `chore(scope): …`, `docs(scope): …`. Scope mirrors module: `livestock`, `admin`, `storefront`, `auth`, `db`, `ci`, `deps`, etc.
+- **Commit body uses the audit format** since there's no PR body: **What**, **Why**, **Verification** (which gates passed, which viewports tested for UI, before/after for design fixes). Past commits like `ff9399f`, `2865798`, `49ebb05` set the bar.
+- **Author**: Nikhilpnkr only. **Never** add a Claude `Co-Authored-By` trailer on any commit or doc. Drop the Anthropic mention from templates.
+- **Parallel-session coordination.** Multiple Claude sessions may run against this repo at once. Before any push, `git pull --rebase origin main` to fold in concurrent work. If a push is rejected as non-fast-forward, rebase locally and push again. Never force-push to `main`.
+- **Internal subagent worktrees are exempt.** The Claude Agent SDK creates temporary worktree-branches for `Explore` / `Plan` / `code-reviewer` agents and cleans them up after the run. Those are isolation primitives, not user-facing branches — the no-branches rule doesn't apply to them.
 
 ## Project-specific conventions
 
