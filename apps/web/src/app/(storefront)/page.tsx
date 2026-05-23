@@ -50,7 +50,10 @@ export default function HomePage() {
       <section className="mx-auto max-w-6xl px-4 py-16">
         <div className="mb-6 flex items-end justify-between">
           <h2 className="font-brand text-3xl font-bold">Today's harvest</h2>
-          <Link href="/shop" className="text-sm font-semibold text-primary hover:underline">
+          <Link
+            href="/shop"
+            className="inline-flex h-11 items-center text-sm font-semibold text-primary hover:underline"
+          >
             See all products →
           </Link>
         </div>
