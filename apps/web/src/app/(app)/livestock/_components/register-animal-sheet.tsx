@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
+import {
+  ACQUISITION_KIND_LABELS,
+  type AnimalRegistrationInput,
+  SEX_LABELS,
+  animalRegistrationSchema,
+} from '@/lib/livestock/schemas';
 import { Button } from '@farmheaven/ui/components/ui/button';
 import { Input } from '@farmheaven/ui/components/ui/input';
 import { Label } from '@farmheaven/ui/components/ui/label';
@@ -16,12 +18,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@farmheaven/ui/components/ui/sheet';
-import {
-  animalRegistrationSchema,
-  ACQUISITION_KIND_LABELS,
-  SEX_LABELS,
-  type AnimalRegistrationInput,
-} from '@/lib/livestock/schemas';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useState, useTransition } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { createAnimal } from '../actions';
 
 type Lookup<T> = readonly T[];
@@ -72,10 +72,7 @@ export function RegisterAnimalSheet({ species, breeds, structures }: Props) {
     }
   }, [open, setFocus]);
 
-  async function submit(
-    values: AnimalRegistrationInput,
-    addAnother: boolean,
-  ): Promise<void> {
+  async function submit(values: AnimalRegistrationInput, addAnother: boolean): Promise<void> {
     setGlobalError(null);
     startTransition(async () => {
       const result = await createAnimal(values);
@@ -131,17 +128,14 @@ export function RegisterAnimalSheet({ species, breeds, structures }: Props) {
         >
           <div className="space-y-1.5">
             <Label htmlFor="tag">Tag *</Label>
-            <Input
-              id="tag"
-              autoFocus
-              autoComplete="off"
-              {...register('tag')}
-            />
+            <Input id="tag" autoFocus autoComplete="off" {...register('tag')} />
             {errors.tag && <p className="text-xs text-red-500">{errors.tag.message}</p>}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="name">Name <span className="text-muted-foreground">(optional)</span></Label>
+            <Label htmlFor="name">
+              Name <span className="text-muted-foreground">(optional)</span>
+            </Label>
             <Input id="name" autoComplete="off" {...register('name')} />
           </div>
 
@@ -177,7 +171,9 @@ export function RegisterAnimalSheet({ species, breeds, structures }: Props) {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="breed_id">Breed <span className="text-muted-foreground">(optional)</span></Label>
+            <Label htmlFor="breed_id">
+              Breed <span className="text-muted-foreground">(optional)</span>
+            </Label>
             <select
               id="breed_id"
               {...register('breed_id')}
@@ -191,17 +187,23 @@ export function RegisterAnimalSheet({ species, breeds, structures }: Props) {
               ))}
             </select>
             {filteredBreeds.length === 0 && (
-              <p className="text-xs text-muted-foreground">No breeds defined for this species yet.</p>
+              <p className="text-xs text-muted-foreground">
+                No breeds defined for this species yet.
+              </p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="date_of_birth">Date of birth <span className="text-muted-foreground">(optional)</span></Label>
+            <Label htmlFor="date_of_birth">
+              Date of birth <span className="text-muted-foreground">(optional)</span>
+            </Label>
             <Input id="date_of_birth" type="date" {...register('date_of_birth')} />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="current_structure_id">Current structure <span className="text-muted-foreground">(optional)</span></Label>
+            <Label htmlFor="current_structure_id">
+              Current structure <span className="text-muted-foreground">(optional)</span>
+            </Label>
             <select
               id="current_structure_id"
               {...register('current_structure_id')}

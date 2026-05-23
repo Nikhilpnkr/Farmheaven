@@ -1,8 +1,8 @@
 'use server';
 
-import { createClient } from '@farmheaven/db/server';
 import type { Database } from '@farmheaven/db';
-import { farmOnboardingSchema, type FarmOnboardingInput } from '@farmheaven/db/schemas';
+import { type FarmOnboardingInput, farmOnboardingSchema } from '@farmheaven/db/schemas';
+import { createClient } from '@farmheaven/db/server';
 import { revalidatePath } from 'next/cache';
 
 type BootstrapFarmArgs = Database['public']['Functions']['bootstrap_farm']['Args'];

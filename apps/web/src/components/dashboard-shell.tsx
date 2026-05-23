@@ -1,10 +1,17 @@
 'use client';
 
+import { signOut } from '@/app/login/actions';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { KpiCard } from '@farmheaven/ui/components/app/kpi-card';
+import { Sidebar, type SidebarSection } from '@farmheaven/ui/components/app/sidebar';
+import { Topbar } from '@farmheaven/ui/components/app/topbar';
+import { Button } from '@farmheaven/ui/components/ui/button';
+import type { User } from '@supabase/supabase-js';
 import {
   ClipboardList,
   FileBarChart,
-  Leaf,
   LayoutDashboard,
+  Leaf,
   Milk,
   Package,
   RadioTower,
@@ -17,14 +24,7 @@ import {
   Wallet,
   Wheat,
 } from 'lucide-react';
-import type { User } from '@supabase/supabase-js';
 import { useState } from 'react';
-import { Sidebar, type SidebarSection } from '@farmheaven/ui/components/app/sidebar';
-import { Topbar } from '@farmheaven/ui/components/app/topbar';
-import { KpiCard } from '@farmheaven/ui/components/app/kpi-card';
-import { Button } from '@farmheaven/ui/components/ui/button';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { signOut } from '@/app/login/actions';
 
 interface Props {
   farmId: string;
@@ -126,8 +126,8 @@ export function DashboardShell({ user }: Props) {
           <div className="rounded-xl border border-dashed border-border bg-card p-10 text-center">
             <h2 className="text-xl font-semibold">Phase 0 complete — you're signed in</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Next: run Phase 1 to enable the Livestock registry. I'll add animal CRUD, health events,
-              breeding, and milk logging.
+              Next: run Phase 1 to enable the Livestock registry. I'll add animal CRUD, health
+              events, breeding, and milk logging.
             </p>
           </div>
         </main>

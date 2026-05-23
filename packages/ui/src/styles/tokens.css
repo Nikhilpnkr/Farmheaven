@@ -6,25 +6,25 @@
 @layer base {
   :root {
     /* shadcn semantic tokens mapped to FarmHeaven's warm off-white palette */
-    --background: 43 48% 96%;        /* canvas off-white */
-    --foreground: 28 23% 10%;        /* text primary */
-    --card: 0 0% 100%;               /* surface raised */
+    --background: 43 48% 96%; /* canvas off-white */
+    --foreground: 28 23% 10%; /* text primary */
+    --card: 0 0% 100%; /* surface raised */
     --card-foreground: 28 23% 10%;
     --popover: 0 0% 100%;
     --popover-foreground: 28 23% 10%;
-    --primary: 123 35% 36%;          /* leaf-600 */
+    --primary: 123 35% 36%; /* leaf-600 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 33 50% 92%;         /* soil-50 */
+    --secondary: 33 50% 92%; /* soil-50 */
     --secondary-foreground: 24 50% 24%;
-    --muted: 43 40% 91%;             /* surface sunken */
-    --muted-foreground: 33 12% 38%;  /* text secondary */
+    --muted: 43 40% 91%; /* surface sunken */
+    --muted-foreground: 33 12% 38%; /* text secondary */
     --accent: 43 40% 91%;
     --accent-foreground: 28 23% 10%;
-    --destructive: 0 65% 47%;        /* danger */
+    --destructive: 0 65% 47%; /* danger */
     --destructive-foreground: 0 0% 100%;
-    --border: 43 25% 85%;            /* border subtle */
+    --border: 43 25% 85%; /* border subtle */
     --input: 43 25% 85%;
-    --ring: 123 35% 36%;             /* leaf-600 */
+    --ring: 123 35% 36%; /* leaf-600 */
     --radius: 0.5rem;
   }
 
@@ -35,7 +35,7 @@
     --card-foreground: 43 34% 93%;
     --popover: 28 10% 12%;
     --popover-foreground: 43 34% 93%;
-    --primary: 124 30% 57%;          /* leaf-500 light */
+    --primary: 124 30% 57%; /* leaf-500 light */
     --primary-foreground: 28 23% 10%;
     --secondary: 33 14% 18%;
     --secondary-foreground: 43 34% 93%;

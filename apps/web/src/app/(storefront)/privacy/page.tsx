@@ -154,8 +154,8 @@ export default function PrivacyPage() {
 
         <p className="mt-8 text-sm text-muted-foreground">
           This policy is drafted in good faith per the DPDPA 2023. For the legal text, refer to the
-          Act on MeitY's website. If you believe your rights are violated, you may approach the
-          Data Protection Board of India.
+          Act on MeitY's website. If you believe your rights are violated, you may approach the Data
+          Protection Board of India.
         </p>
       </section>
     </main>

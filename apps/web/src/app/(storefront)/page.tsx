@@ -84,9 +84,7 @@ export default function HomePage() {
         <div className="rounded-3xl border border-leaf-500 bg-gradient-to-br from-leaf-50 to-turmeric-50 p-10">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <div>
-              <h3 className="font-brand text-3xl font-bold">
-                Meet the cow behind your milk.
-              </h3>
+              <h3 className="font-brand text-3xl font-bold">Meet the cow behind your milk.</h3>
               <p className="mt-2 max-w-xl text-base text-muted-foreground">
                 Every pack has a QR code. Scan it — see which animal, which plot, who milked, who
                 packed. Real traceability, not a sticker.

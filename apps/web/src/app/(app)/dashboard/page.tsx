@@ -1,6 +1,6 @@
+import { DashboardShell } from '@/components/dashboard-shell';
 import { getCurrentFarmId, getUser } from '@farmheaven/db/server';
 import { redirect } from 'next/navigation';
-import { DashboardShell } from '@/components/dashboard-shell';
 
 export default async function HomePage() {
   const user = await getUser();

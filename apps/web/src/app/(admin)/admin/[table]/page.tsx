@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { Button } from '@farmheaven/ui/components/ui/button';
 import {
   Table,
   TableBody,
@@ -8,7 +7,8 @@ import {
   TableHeader,
   TableRow,
 } from '@farmheaven/ui/components/ui/table';
-import { Button } from '@farmheaven/ui/components/ui/button';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { assertSuperAdmin, createAdminClient } from '../_lib/admin-client';
 import { findTable } from '../_lib/table-list';
 
@@ -39,8 +39,11 @@ export default async function TableListPage({
   const config = findTable(table);
   if (!config) notFound();
 
-  const page = Math.max(1, parseInt(sp.page ?? '1', 10) || 1);
-  const size = Math.min(200, Math.max(1, parseInt(sp.size ?? String(PAGE_SIZE_DEFAULT), 10) || PAGE_SIZE_DEFAULT));
+  const page = Math.max(1, Number.parseInt(sp.page ?? '1', 10) || 1);
+  const size = Math.min(
+    200,
+    Math.max(1, Number.parseInt(sp.size ?? String(PAGE_SIZE_DEFAULT), 10) || PAGE_SIZE_DEFAULT),
+  );
   const order = sp.order && config.listColumns.includes(sp.order) ? sp.order : 'created_at';
   const dir: 'asc' | 'desc' = sp.dir === 'asc' ? 'asc' : 'desc';
 
@@ -81,7 +84,10 @@ export default async function TableListPage({
 
   const rows = (rowsResult.data ?? []) as Record<string, unknown>[];
   const rawCount = rowsResult.count ?? 0;
-  const countLabel = rawCount > COUNT_CAP ? `${COUNT_CAP.toLocaleString()}+ rows` : `${rawCount.toLocaleString()} rows`;
+  const countLabel =
+    rawCount > COUNT_CAP
+      ? `${COUNT_CAP.toLocaleString()}+ rows`
+      : `${rawCount.toLocaleString()} rows`;
   const totalPages = Math.max(1, Math.ceil(Math.min(rawCount, COUNT_CAP) / size));
 
   return (
@@ -100,7 +106,12 @@ export default async function TableListPage({
                   <Link
                     href={{
                       pathname: `/admin/${table}`,
-                      query: { page: '1', size, order: col, dir: order === col && dir === 'asc' ? 'desc' : 'asc' },
+                      query: {
+                        page: '1',
+                        size,
+                        order: col,
+                        dir: order === col && dir === 'asc' ? 'desc' : 'asc',
+                      },
                     }}
                     className="hover:text-zinc-100"
                   >
@@ -118,12 +129,21 @@ export default async function TableListPage({
               return (
                 <TableRow key={id} className="border-zinc-800 hover:bg-zinc-900/50">
                   {config.listColumns.map((col) => (
-                    <TableCell key={col} className="max-w-xs truncate font-mono text-xs" title={formatCell(row[col])}>
+                    <TableCell
+                      key={col}
+                      className="max-w-xs truncate font-mono text-xs"
+                      title={formatCell(row[col])}
+                    >
                       {formatCell(row[col])}
                     </TableCell>
                   ))}
                   <TableCell className="text-right">
-                    <Button asChild size="sm" variant="ghost" className="text-amber-400 hover:bg-zinc-800 hover:text-amber-300">
+                    <Button
+                      asChild
+                      size="sm"
+                      variant="ghost"
+                      className="text-amber-400 hover:bg-zinc-800 hover:text-amber-300"
+                    >
                       <Link href={`/admin/${table}/${id}`}>edit →</Link>
                     </Button>
                   </TableCell>
@@ -137,7 +157,12 @@ export default async function TableListPage({
       <nav className="mt-4 flex items-center justify-between text-sm text-zinc-400">
         {page > 1 ? (
           <Button asChild size="sm" variant="ghost">
-            <Link href={{ pathname: `/admin/${table}`, query: { page: String(page - 1), size, order, dir } }}>
+            <Link
+              href={{
+                pathname: `/admin/${table}`,
+                query: { page: String(page - 1), size, order, dir },
+              }}
+            >
               ‹‹ Prev
             </Link>
           </Button>
@@ -151,7 +176,12 @@ export default async function TableListPage({
         </span>
         {page < totalPages ? (
           <Button asChild size="sm" variant="ghost">
-            <Link href={{ pathname: `/admin/${table}`, query: { page: String(page + 1), size, order, dir } }}>
+            <Link
+              href={{
+                pathname: `/admin/${table}`,
+                query: { page: String(page + 1), size, order, dir },
+              }}
+            >
               Next ››
             </Link>
           </Button>

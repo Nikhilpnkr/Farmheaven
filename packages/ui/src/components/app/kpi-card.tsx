@@ -50,7 +50,9 @@ export function KpiCard({
       <div className="mb-0.5 text-[12.5px] text-muted-foreground">{label}</div>
       <div className="flex items-baseline gap-1.5">
         <span className="text-[28px] font-bold leading-none tracking-tight">{value}</span>
-        {unit ? <span className="text-[13px] font-medium text-muted-foreground">{unit}</span> : null}
+        {unit ? (
+          <span className="text-[13px] font-medium text-muted-foreground">{unit}</span>
+        ) : null}
       </div>
       {delta ? (
         <span

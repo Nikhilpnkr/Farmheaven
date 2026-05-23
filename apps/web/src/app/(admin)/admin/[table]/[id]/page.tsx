@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { assertSuperAdmin, createAdminClient } from '../../_lib/admin-client';
 import { findTable } from '../../_lib/table-list';
-import { EditJsonModal } from './edit-json-modal';
 import { DeleteButton } from './delete-button';
+import { EditJsonModal } from './edit-json-modal';
 
 export const dynamic = 'force-dynamic';
 

@@ -8,7 +8,12 @@ export default function GrievancePage() {
       <div className="mt-8 rounded-lg border border-border bg-card p-6 text-base">
         <div className="font-semibold">Suprameds (Founder & Grievance Officer)</div>
         <div className="mt-3 space-y-1 text-muted-foreground">
-          <div>Email: <a href="mailto:grievance@farmheaven.in" className="underline">grievance@farmheaven.in</a></div>
+          <div>
+            Email:{' '}
+            <a href="mailto:grievance@farmheaven.in" className="underline">
+              grievance@farmheaven.in
+            </a>
+          </div>
           <div>Phone: +91 98XX XX0001</div>
           <div>Address: FarmHeaven Pvt Ltd, Hyderabad, Telangana 500075</div>
         </div>

@@ -39,7 +39,10 @@ export default function DataRequestPage() {
       <div className="mt-10 rounded-lg border border-border bg-muted p-5 text-sm">
         <div className="font-semibold">Need to talk to someone?</div>
         <div className="mt-2">
-          Email <a href="mailto:grievance@farmheaven.in" className="underline">grievance@farmheaven.in</a>{' '}
+          Email{' '}
+          <a href="mailto:grievance@farmheaven.in" className="underline">
+            grievance@farmheaven.in
+          </a>{' '}
           or WhatsApp +91 98XX XX0001. Our Grievance Officer responds within 30 days. If you're not
           satisfied, you may escalate to the Data Protection Board of India.
         </div>

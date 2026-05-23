@@ -18,7 +18,14 @@ interface TopbarProps {
   className?: string;
 }
 
-export function Topbar({ lang, onLangChange, weather, alertCount, actions, className }: TopbarProps) {
+export function Topbar({
+  lang,
+  onLangChange,
+  weather,
+  alertCount,
+  actions,
+  className,
+}: TopbarProps) {
   return (
     <div
       className={cn(

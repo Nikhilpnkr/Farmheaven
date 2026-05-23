@@ -1,5 +1,5 @@
 import { updateSession } from '@farmheaven/db/middleware';
-import { NextResponse, type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 // Public storefront paths — accessible without auth. Add new public routes here.
 // Note: '/' is the storefront marketing home (also public).

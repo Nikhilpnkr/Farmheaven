@@ -39,7 +39,10 @@ export async function updateSession(request: NextRequest) {
 export async function requireAuth(
   request: NextRequest,
   loginPath = '/login',
-): Promise<{ response: NextResponse; user: NonNullable<Awaited<ReturnType<typeof updateSession>>['user']> } | NextResponse> {
+): Promise<
+  | { response: NextResponse; user: NonNullable<Awaited<ReturnType<typeof updateSession>>['user']> }
+  | NextResponse
+> {
   const { response, user } = await updateSession(request);
   if (!user) {
     const url = request.nextUrl.clone();
