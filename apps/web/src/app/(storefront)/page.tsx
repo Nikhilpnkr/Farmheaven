@@ -1,5 +1,11 @@
 import { BadgeCheck, Heart, MapPin, Sprout } from 'lucide-react';
 import Link from 'next/link';
+import {
+  EggsIllustration,
+  GheeJarIllustration,
+  MilkBottleIllustration,
+  PalakIllustration,
+} from './_components/product-illustrations';
 
 export default function HomePage() {
   return (
@@ -196,119 +202,8 @@ function HillSilhouette() {
   );
 }
 
-function MilkBottleIllustration() {
-  return (
-    <svg viewBox="0 0 100 100" width="90" height="90" className="text-emerald-900">
-      <title>Milk bottle</title>
-      {/* Cap */}
-      <rect
-        x="42"
-        y="14"
-        width="16"
-        height="8"
-        rx="1.5"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        fill="currentColor"
-      />
-      {/* Neck taper into bottle */}
-      <path
-        d="M44 22 L44 30 L36 38 L36 82 Q36 88 42 88 L58 88 Q64 88 64 82 L64 38 L56 30 L56 22"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        fill="white"
-        strokeLinejoin="round"
-      />
-      {/* Milk level */}
-      <line
-        x1="38"
-        y1="62"
-        x2="62"
-        y2="62"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        opacity="0.5"
-      />
-    </svg>
-  );
-}
-
-function GheeJarIllustration() {
-  return (
-    <svg viewBox="0 0 100 100" width="92" height="92" className="text-emerald-900">
-      <title>Ghee jar</title>
-      {/* Lid */}
-      <rect
-        x="30"
-        y="16"
-        width="40"
-        height="9"
-        rx="1.5"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        fill="currentColor"
-      />
-      {/* Jar body */}
-      <path
-        d="M34 25 L34 82 Q34 90 42 90 L58 90 Q66 90 66 82 L66 25"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        fill="rgba(255,255,255,0.6)"
-        strokeLinejoin="round"
-      />
-      {/* Ghee surface curve */}
-      <path d="M34 42 Q50 37 66 42" stroke="currentColor" strokeWidth="1.5" fill="none" />
-    </svg>
-  );
-}
-
-function EggsIllustration() {
-  return (
-    <svg viewBox="0 0 120 100" width="100" height="84" className="text-amber-50">
-      <title>Three eggs</title>
-      {/* Three eggs — slightly overlapping, back ones smaller */}
-      <ellipse cx="40" cy="60" rx="13" ry="17" fill="currentColor" opacity="0.92" />
-      <ellipse cx="80" cy="60" rx="13" ry="17" fill="currentColor" opacity="0.92" />
-      <ellipse cx="60" cy="50" rx="14" ry="18" fill="currentColor" />
-      {/* Subtle highlights */}
-      <ellipse cx="36" cy="52" rx="2.5" ry="3.5" fill="white" opacity="0.5" />
-      <ellipse cx="76" cy="52" rx="2.5" ry="3.5" fill="white" opacity="0.5" />
-      <ellipse cx="56" cy="42" rx="3" ry="4" fill="white" opacity="0.5" />
-    </svg>
-  );
-}
-
-function PalakIllustration() {
-  return (
-    <svg viewBox="0 0 100 100" width="92" height="92" className="text-yellow-50">
-      <title>Spinach leaves</title>
-      {/* Leaf 1 (back) */}
-      <path d="M50 80 Q35 60 40 35 Q55 28 62 50 Q60 72 50 80 Z" fill="currentColor" opacity="0.7" />
-      {/* Leaf 2 (front, larger) */}
-      <path d="M55 85 Q40 70 38 42 Q56 32 72 52 Q68 78 55 85 Z" fill="currentColor" />
-      {/* Veins */}
-      <line
-        x1="55"
-        y1="85"
-        x2="55"
-        y2="40"
-        stroke="rgba(0,0,0,0.18)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <line
-        x1="50"
-        y1="80"
-        x2="50"
-        y2="40"
-        stroke="rgba(0,0,0,0.12)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
+/* Product illustrations live in _components/product-illustrations.tsx
+   so /shop can use the same set without duplicating SVG markup. */
 
 /* ------- product data ------- */
 
