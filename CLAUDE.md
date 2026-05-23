@@ -44,26 +44,26 @@ Enforced via Lighthouse CI on every PR (set up if missing — see "Tooling to ad
 
 ### 4. Testing — every PR
 
-The repo has no test framework yet. Adding one is part of going prod-ready (see "Tooling to add"). Once installed, these rules apply:
+Vitest 3 is installed at `apps/web/` (config: [apps/web/vitest.config.ts](apps/web/vitest.config.ts)). Tests live in `apps/web/__tests__/` mirroring `src/`. Run via `pnpm test` (turbo) or `pnpm --filter @farmheaven/web test` directly.
 
-- **Unit tests** (Vitest): every Zod schema, every pure util in `lib/`, every server action's validation branch.
-- **Integration tests** (Vitest + `@testing-library/react`): every form's happy path + one validation-error path.
-- **E2E tests** (Playwright): the critical paths only — login, register animal, log milk, customer checkout, QR trace page. Run on mobile viewport (Pixel 7) in CI.
-- **No mocking the DB**. Tests hit a Supabase branch DB (per [Supabase MCP `create_branch`](https://supabase.com/docs/guides/cli/branching)). Mocked DB tests are banned — they passed for us before while the real migration broke.
-- **Coverage gate**: 70% statements on `lib/` and `actions/`; UI components are not coverage-gated (visual via Playwright instead).
+- **Unit tests** (Vitest): every Zod schema, every pure util in `lib/`, every server action's validation branch. Examples in `apps/web/__tests__/lib/livestock/` and `apps/web/__tests__/app/livestock/`.
+- **Integration tests** (Vitest + `@testing-library/react`): every form's happy path + one validation-error path. Needs `environment: 'jsdom'` per-file via `// @vitest-environment jsdom`.
+- **E2E tests** (Playwright — not yet installed): the critical paths only — login, register animal, log milk, customer checkout, QR trace page. Run on mobile viewport (Pixel 7) in CI.
+- **No mocking the DB**. Tests hit a Supabase branch DB (per [Supabase MCP `create_branch`](https://supabase.com/docs/guides/cli/branching)). Mocked DB tests are banned — they passed for us before while the real migration broke. Mocking module *shells* (e.g. `vi.mock('next/cache')` so a Node test can load a server action) is fine; mocking DB *responses* is not.
+- **Coverage gate**: 70% statements on `lib/` and `actions/` (enforced in vitest.config.ts). UI components not coverage-gated (Playwright covers them visually).
 - **No `it.skip` / `test.skip` in main**. If a test is broken, fix it or delete it; don't park it.
 
 ### 5. Type safety
 
-- `tsc --noEmit` must pass. CI fails on TS errors. No `// @ts-ignore` without a `// reason: ...` next line. `// @ts-expect-error` preferred.
+- `tsc --noEmit` must pass. `next.config.ts` no longer has `ignoreBuildErrors` (cleared 2026-05-23) — TS errors fail the Vercel build too. No `// @ts-ignore` without a `// reason: ...` next line. `// @ts-expect-error` preferred.
 - No `any`. Use `unknown` and narrow. Biome warns on `noExplicitAny` — keep it warning-clean.
 - DB types are generated: `pnpm db:types`. Never hand-write a `Database` row type.
 - Server action inputs are **always** parsed by a Zod schema before use. Never trust `FormData` directly.
 
 ### 6. Security
 
-- **RLS on by default** for every table. New migrations that create a table MUST include policies in the same migration. CI rejects migrations that add a table without `enable row level security`.
-- **`createAdminClient` (service role)** is locked to `app/(admin)/` by the CI guard at [scripts/check-admin-client-usage.sh](scripts/). Don't widen it.
+- **RLS on by default** for every table. New migrations that create a table MUST include policies in the same migration. CI rejects migrations that add a table without `enable row level security`. The `/supabase-migration` skill scaffolds + validates the policy block; the `rls-policy-reviewer` subagent audits a migration before commit.
+- **`createAdminClient` (service role)** is locked to `app/(admin)/` by [scripts/check-admin-import-boundary.sh](scripts/check-admin-import-boundary.sh). This runs in CI AND on every Edit/Write via the post-edit hook (see `.claude/settings.json`) — leaks fail immediately, not on PR. Don't widen it.
 - **No secrets in client bundles**. `NEXT_PUBLIC_*` is the only public prefix; everything else is server-only.
 - **CSP + security headers** on every response (via `next.config.ts` headers). Storefront pages need stricter CSP than admin.
 - **Input validation**: Zod at every server-action boundary, every API route, every webhook. Razorpay webhooks must verify HMAC signature.
@@ -72,9 +72,12 @@ The repo has no test framework yet. Adding one is part of going prod-ready (see 
 
 ### 7. Observability
 
-- **Sentry** is wired; keep it that way. Server actions wrap errors with `Sentry.captureException` before rethrowing. Don't swallow.
+- **Sentry** is wired on `apps/web` via `@sentry/nextjs@^9.47` across all three runtimes (browser, Node server, Edge). Init files are unit-tested — see `apps/web/__tests__/instrumentation*.test.ts` and `sentry.{server,edge}.config.test.ts`. Sample rates: 100% traces in dev, 10% in prod; Session Replay 10% of sessions, 100% on errors; `enableLogs: true`; `sendDefaultPii: true`. Tunnel route is `/monitoring` (excluded from the middleware matcher). `next.config.ts` wraps with `withSentryConfig(withNextIntl(...))`.
+- Server actions wrap errors with `Sentry.captureException` before rethrowing. Don't swallow.
+- `app/global-error.tsx` calls `Sentry.captureException` in its `useEffect`. Don't remove that hook.
 - **Structured logging**: server-side `console.log` is banned outside of `dev`. Use `lib/logger.ts` (add it if missing — `pino`).
 - **Every user-facing error has a toast** (sonner) AND a Sentry event with breadcrumb context.
+- Source maps are NOT yet uploaded to Sentry — production stack traces will be minified until `SENTRY_AUTH_TOKEN` + `SENTRY_ORG` + `SENTRY_PROJECT` are set on the farmheaven-web Vercel project. See "Tooling to add".
 
 ### 8. SEO + storefront-readiness
 
@@ -88,25 +91,40 @@ The repo has no test framework yet. Adding one is part of going prod-ready (see 
 Before claiming a task is done, every one of these must pass:
 
 ```bash
-pnpm typecheck       # turbo across workspaces
+pnpm typecheck       # turbo across workspaces; gated since 2026-05-23
 pnpm check           # biome lint + format check
+pnpm test            # vitest run via turbo (32 tests, ~1.3s)
 pnpm --filter @farmheaven/web build   # next build must succeed
-pnpm test            # once vitest is installed
+bash scripts/check-admin-import-boundary.sh   # service-role boundary
 pnpm e2e             # once playwright is installed; mobile viewport
 ```
 
-For a UI change, also: open the dev server, drive the change in Chrome devtools mobile emulation (Pixel 7 + iPhone SE), take a screenshot, confirm no console errors, confirm no horizontal scroll.
+For a UI change, also: invoke the `/mobile-viewport-check` skill (or the `mobile-a11y-reviewer` subagent for PR-grade audit). Both drive Chrome DevTools MCP through 375/390/412/768 viewports, assert no horizontal scroll, validate 44px tap targets, dump console errors.
+
+## Claude Code automations (`.claude/`)
+
+These are wired up and active. Files live in `.claude/` and are checked in.
+
+- **Hooks** ([.claude/settings.json](.claude/settings.json)) — fire on every `Edit`/`Write`/`MultiEdit`:
+  - `biome check --write apps/web/src packages` — autoformat + lint
+  - `scripts/check-admin-import-boundary.sh` — block service-role leaks outside `(admin)/`
+- **Skills** (`.claude/skills/`):
+  - `mobile-viewport-check` — proactive after any UI edit; drives Chrome DevTools through 4 mobile viewports, screenshots + asserts.
+  - `supabase-migration` — user-only (`/supabase-migration <slug>`); scaffolds migration with RLS+policies stubbed, validates on a Supabase branch.
+- **Subagents** (`.claude/agents/`):
+  - `rls-policy-reviewer` — auto-dispatched on migration edits; static analysis of every `CREATE TABLE` for RLS + policies + SECURITY DEFINER hygiene.
+  - `mobile-a11y-reviewer` — invoke after a UI change with a running dev server; full axe-core scan + tap-target + font-size + horizontal-scroll audit at 375 and 412.
 
 ## Tooling to add (prod-readiness checklist)
 
-These are missing right now. Each is a small PR.
+Each is a small PR.
 
-- [ ] **Vitest** + `@testing-library/react` + `@testing-library/jest-dom`. Config in `apps/web/vitest.config.ts`. Wire `pnpm test` at root via turbo.
+- [x] **Vitest** + `@testing-library/react` + jsdom. Config at [apps/web/vitest.config.ts](apps/web/vitest.config.ts), 70% coverage gate, 32 tests in `apps/web/__tests__/` (8 Sentry init + 24 livestock). (Done 2026-05-23.)
 - [ ] **Playwright** with mobile project (Pixel 7) + desktop project. Smoke suite covers login, register animal, log milk, checkout, trace page. CI runs on PR.
 - [ ] **Lighthouse CI** GitHub Action on every PR. Mobile preset. Budget file in `.lighthouserc.json`. Hard-fail thresholds: LCP 2.5s, INP 200ms, CLS 0.1.
 - [ ] **`@axe-core/playwright`** integration — every E2E test ends with `await checkA11y(page)`. Zero serious/critical issues.
 - [ ] **`@next/bundle-analyzer`** behind `ANALYZE=true`. Add `pnpm analyze` script. Review on every dependency change.
-- [ ] **Sentry source maps** uploaded on build (already wired? verify in `next.config.ts`).
+- [ ] **Sentry source maps**: `withSentryConfig` in `apps/web/next.config.ts` is wired to upload but no auth token is set. Generate one at sentry.io/settings/auth-tokens with `project:releases` + `org:read` scopes, then set `SENTRY_AUTH_TOKEN` + `SENTRY_ORG` + `SENTRY_PROJECT` on the farmheaven-web Vercel project. Without these, production stack traces stay minified.
 - [ ] **PostHog** (or alternative) for product analytics — events for: animal registered, milk logged, product added to cart, checkout completed, QR scanned. Opt-out for storefront customers.
 - [ ] **`@vercel/og`** for dynamic OG images on `/product/[slug]` and `/trace/[slug]`.
 - [ ] **CSP middleware** with nonce-based script-src. Strict on `(storefront)`, looser on `(app)` if needed.
