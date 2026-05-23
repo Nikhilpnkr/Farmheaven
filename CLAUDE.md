@@ -2,6 +2,17 @@
 
 > Read this before touching code. These are non-negotiable.
 
+## Current state (2026-05-23)
+
+- **Active branch:** `feat/collapse-phase-0` open as [PR #1](https://github.com/Nikhilpnkr/Farmheaven/pull/1) — TDD Sentry SDK wiring + TS-debt cleanup + app-router icon/OG images
+- **Shipped on `main`:** 3-app → 1-app collapse · Phase 0 (phone-OTP auth + onboarding via `bootstrap_farm` RPC) · Meadow theme + dual light/dark · Super-admin `/admin/[table]` browser · Phase 1A livestock registry
+- **Live preview:** `https://farmheaven-web-git-main-badgers-projects-c8635f3c.vercel.app` — Vercel deployment-protected, use the Vercel MCP `get_access_to_vercel_url` for a 23-hour bypass token. `farmheaven.in` not yet mapped.
+- **Migrations applied:** 19 (`01_extensions` → `19_super_admin_column`)
+- **Test suite:** 32 cases across 7 files, ~1.3s runtime
+- **Vercel projects:** 1 active (`farmheaven-web`) · 3 zombies from pre-collapse (`farmheaven-console/storefront/worker`) that auto-cancel on every push — delete in dashboard when convenient
+- **Design baseline:** B+ composite, B AI-slop. Full audit + screenshots at `.design-audit/` (gitignored). 3 high-impact open: 14 sub-44px tap targets on storefront, `/login` phone input at 40px, hero badge-cluster wrap on mobile.
+- **Next up:** Phase 1B per `C:\Users\pc\Downloads\FARMHEAVEN_BUILD_PLAN.md` — likely flocks or the unified `events` table.
+
 ## Stack
 
 Single Next.js 15 app at `apps/web`, route groups: `(app)` farmer console, `(admin)` super-admin, `(storefront)` public customer site. pnpm + turborepo monorepo. React 19. TypeScript strict. Tailwind 3.4 + shadcn/ui. Supabase (raw `@supabase/ssr` client + generated types — **NO Drizzle**, despite what older docs say). React Hook Form + Zod. TanStack Query for client cache, nuqs for URL state. Biome for lint+format. Sentry for errors/tracing/replay. Razorpay for payments. date-fns for dates.
@@ -81,7 +92,8 @@ Vitest 3 is installed at `apps/web/` (config: [apps/web/vitest.config.ts](apps/w
 
 ### 8. SEO + storefront-readiness
 
-- Storefront routes use `generateMetadata`. Title + description + OG image + canonical URL on every page.
+- Storefront routes use `generateMetadata`. Title + description + canonical URL on every page. Default OG image inherits from `apps/web/src/app/opengraph-image.tsx` (1200×630 brand card via `ImageResponse`); override per-route by adding `opengraph-image.tsx` in that route's segment.
+- Default site icons live at `apps/web/src/app/icon.tsx` (32×32) and `apple-icon.tsx` (180×180) — also `ImageResponse`-rendered, no PNG bytes in git. Killed 6 production 404s on 2026-05-23.
 - `next-sitemap` auto-generates `sitemap.xml` on build. `/trace/[slug]` pages MUST be in the sitemap (they're the traffic funnel).
 - `/trace/[slug]` renders fully SSR — no `'use client'` at the root, no Suspense fallbacks above the fold. JSON-LD `Product` + `Organization` structured data.
 - robots.txt allows storefront + trace pages, disallows `(app)/*` and `(admin)/*`.
@@ -126,7 +138,7 @@ Each is a small PR.
 - [ ] **`@next/bundle-analyzer`** behind `ANALYZE=true`. Add `pnpm analyze` script. Review on every dependency change.
 - [ ] **Sentry source maps**: `withSentryConfig` in `apps/web/next.config.ts` is wired to upload but no auth token is set. Generate one at sentry.io/settings/auth-tokens with `project:releases` + `org:read` scopes, then set `SENTRY_AUTH_TOKEN` + `SENTRY_ORG` + `SENTRY_PROJECT` on the farmheaven-web Vercel project. Without these, production stack traces stay minified.
 - [ ] **PostHog** (or alternative) for product analytics — events for: animal registered, milk logged, product added to cart, checkout completed, QR scanned. Opt-out for storefront customers.
-- [ ] **`@vercel/og`** for dynamic OG images on `/product/[slug]` and `/trace/[slug]`.
+- [ ] **`@vercel/og` per-route dynamic OG images** on `/product/[slug]` and `/trace/[slug]` — the infrastructure (`next/og` `ImageResponse`) is proven via `apps/web/src/app/opengraph-image.tsx`; remaining work is the per-route variants that pull product/animal data into the card.
 - [ ] **CSP middleware** with nonce-based script-src. Strict on `(storefront)`, looser on `(app)` if needed.
 - [ ] **Renovate or Dependabot** weekly grouped PRs for deps.
 - [ ] **`pnpm audit --prod`** as a CI step; fail on high/critical.

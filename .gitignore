@@ -51,3 +51,4 @@ src/types/database.ts
 .env.sentry-build-plugin
 .sentryclirc
 .claude/settings.local.json
+.design-audit/
