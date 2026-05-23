@@ -1,5 +1,5 @@
 import { updateSession } from '@farmheaven/db/middleware';
-import { NextResponse, type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 // Public storefront paths — accessible without auth. Add new public routes here.
 // Note: '/' is the storefront marketing home (also public).
@@ -75,7 +75,8 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+  // Exclude Sentry tunnel route (/monitoring), Next.js internals, and static assets.
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!monitoring|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

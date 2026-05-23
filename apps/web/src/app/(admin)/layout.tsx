@@ -1,8 +1,8 @@
-import Link from 'next/link';
+import { Separator } from '@farmheaven/ui/components/ui/separator';
 import { ShieldAlert } from 'lucide-react';
+import Link from 'next/link';
 import { assertSuperAdmin } from './admin/_lib/admin-client';
 import { ADMIN_GROUPS } from './admin/_lib/table-list';
-import { Separator } from '@farmheaven/ui/components/ui/separator';
 
 export const dynamic = 'force-dynamic';
 

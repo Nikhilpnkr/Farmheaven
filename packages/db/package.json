@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@farmheaven/config": "workspace:*",
+    "next": "15.5.18",
     "typescript": "^5.7.2"
   }
 }

@@ -1,26 +1,38 @@
 import Link from 'next/link';
 
+// Shared hitbox class for inline text links. Forces every interactive
+// element to clear the 44x44 iOS HIG floor required by CLAUDE.md §1
+// even where the visual text is much shorter. `inline-flex` keeps the
+// link inline-with-text in the header; the footer turns it into `flex`
+// so the hit area fills the column width (44px tall is the constraint
+// that matters there).
+const navLink = 'inline-flex h-11 items-center hover:text-primary';
+const footerLink = 'flex h-11 items-center hover:text-primary';
+
 export default function StorefrontLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <Link href="/" className="font-brand text-2xl font-bold tracking-tight">
+          <Link
+            href="/"
+            className="inline-flex h-11 items-center font-brand text-2xl font-bold tracking-tight"
+          >
             FarmHeaven
           </Link>
-          <nav className="flex items-center gap-6 text-sm font-medium">
-            <Link href="/shop" className="hover:text-primary">
+          <nav className="flex items-center gap-4 text-sm font-medium sm:gap-6">
+            <Link href="/shop" className={navLink}>
               Shop
             </Link>
-            <Link href="/subscribe" className="hover:text-primary">
+            <Link href="/subscribe" className={navLink}>
               Subscribe
             </Link>
-            <Link href="/meet-the-farm" className="hover:text-primary">
+            <Link href="/meet-the-farm" className={navLink}>
               Meet the farm
             </Link>
             <Link
               href="/shop"
-              className="rounded-full bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90"
+              className="inline-flex h-11 items-center rounded-full bg-primary px-4 text-primary-foreground hover:bg-primary/90"
             >
               Start a weekly box
             </Link>
@@ -42,15 +54,21 @@ export default function StorefrontLayout({ children }: { children: React.ReactNo
             <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Shop
             </h4>
-            <ul className="mt-2 space-y-1 text-sm">
+            <ul className="mt-2 text-sm">
               <li>
-                <Link href="/shop">All products</Link>
+                <Link href="/shop" className={footerLink}>
+                  All products
+                </Link>
               </li>
               <li>
-                <Link href="/subscribe">Weekly boxes</Link>
+                <Link href="/subscribe" className={footerLink}>
+                  Weekly boxes
+                </Link>
               </li>
               <li>
-                <Link href="/farm-tour">Farm tours</Link>
+                <Link href="/farm-tour" className={footerLink}>
+                  Farm tours
+                </Link>
               </li>
             </ul>
           </div>
@@ -58,15 +76,21 @@ export default function StorefrontLayout({ children }: { children: React.ReactNo
             <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Company
             </h4>
-            <ul className="mt-2 space-y-1 text-sm">
+            <ul className="mt-2 text-sm">
               <li>
-                <Link href="/meet-the-farm">About us</Link>
+                <Link href="/meet-the-farm" className={footerLink}>
+                  About us
+                </Link>
               </li>
               <li>
-                <Link href="/contact">Contact</Link>
+                <Link href="/contact" className={footerLink}>
+                  Contact
+                </Link>
               </li>
               <li>
-                <Link href="/traceability">Traceability</Link>
+                <Link href="/traceability" className={footerLink}>
+                  Traceability
+                </Link>
               </li>
             </ul>
           </div>
@@ -74,18 +98,26 @@ export default function StorefrontLayout({ children }: { children: React.ReactNo
             <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Legal
             </h4>
-            <ul className="mt-2 space-y-1 text-sm">
+            <ul className="mt-2 text-sm">
               <li>
-                <Link href="/privacy">Privacy Policy</Link>
+                <Link href="/privacy" className={footerLink}>
+                  Privacy Policy
+                </Link>
               </li>
               <li>
-                <Link href="/terms">Terms of service</Link>
+                <Link href="/terms" className={footerLink}>
+                  Terms of service
+                </Link>
               </li>
               <li>
-                <Link href="/data-request">My data (DPDPA)</Link>
+                <Link href="/data-request" className={footerLink}>
+                  My data (DPDPA)
+                </Link>
               </li>
               <li>
-                <Link href="/grievance">Grievance officer</Link>
+                <Link href="/grievance" className={footerLink}>
+                  Grievance officer
+                </Link>
               </li>
             </ul>
           </div>

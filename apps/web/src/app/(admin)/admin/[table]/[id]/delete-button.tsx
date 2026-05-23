@@ -1,7 +1,5 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-import { toast } from 'sonner';
 import { Button } from '@farmheaven/ui/components/ui/button';
 import {
   Dialog,
@@ -14,6 +12,8 @@ import {
 } from '@farmheaven/ui/components/ui/dialog';
 import { Input } from '@farmheaven/ui/components/ui/input';
 import { Label } from '@farmheaven/ui/components/ui/label';
+import { useState, useTransition } from 'react';
+import { toast } from 'sonner';
 import { deleteRow } from './actions';
 
 export function DeleteButton({
@@ -64,9 +64,7 @@ export function DeleteButton({
       </DialogTrigger>
       <DialogContent className="bg-zinc-900 text-zinc-100">
         <DialogHeader>
-          <DialogTitle className="font-mono text-red-400">
-            Delete {table} row
-          </DialogTitle>
+          <DialogTitle className="font-mono text-red-400">Delete {table} row</DialogTitle>
           <DialogDescription>
             Type the row's {pkColumn} exactly to confirm deletion. This cannot be undone.
           </DialogDescription>
@@ -95,11 +93,7 @@ export function DeleteButton({
           <Button variant="ghost" onClick={() => setOpen(false)} disabled={pending}>
             Cancel
           </Button>
-          <Button
-            variant="destructive"
-            disabled={!canDelete || pending}
-            onClick={handleDelete}
-          >
+          <Button variant="destructive" disabled={!canDelete || pending} onClick={handleDelete}>
             {pending ? 'Deleting…' : 'Delete forever'}
           </Button>
         </DialogFooter>

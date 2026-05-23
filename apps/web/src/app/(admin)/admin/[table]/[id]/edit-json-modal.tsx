@@ -1,7 +1,5 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-import { toast } from 'sonner';
 import { Button } from '@farmheaven/ui/components/ui/button';
 import {
   Dialog,
@@ -12,6 +10,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@farmheaven/ui/components/ui/dialog';
+import { useState, useTransition } from 'react';
+import { toast } from 'sonner';
 import { updateRow } from './actions';
 
 export function EditJsonModal({
@@ -62,15 +62,17 @@ export function EditJsonModal({
       }}
     >
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-100 hover:bg-zinc-800">
+        <Button
+          size="sm"
+          variant="outline"
+          className="border-zinc-700 text-zinc-100 hover:bg-zinc-800"
+        >
           Edit JSON
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-3xl bg-zinc-900 text-zinc-100">
         <DialogHeader>
-          <DialogTitle className="font-mono">
-            Edit {table} row
-          </DialogTitle>
+          <DialogTitle className="font-mono">Edit {table} row</DialogTitle>
           <DialogDescription className="text-amber-400">
             ⚠ You are editing live data via service-role. No undo.
           </DialogDescription>

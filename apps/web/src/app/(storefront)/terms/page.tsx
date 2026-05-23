@@ -11,7 +11,9 @@ export default function TermsPage() {
       <p className="mt-2 text-sm text-muted-foreground">Last updated: 21 April 2026</p>
 
       <section className="prose prose-neutral mt-8 max-w-none">
-        <p>By using FarmHeaven you agree to these terms. If you don't, please don't use our service.</p>
+        <p>
+          By using FarmHeaven you agree to these terms. If you don't, please don't use our service.
+        </p>
 
         <h2 className="mt-6 text-xl font-bold">1. Orders and delivery</h2>
         <p>

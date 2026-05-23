@@ -7,9 +7,7 @@ export const e164PhoneSchema = z
   .string()
   .regex(/^\+?[1-9]\d{1,14}$/, 'Enter a valid phone number (e.g. +919876543210)');
 
-export const indianPincodeSchema = z
-  .string()
-  .regex(/^[1-9]\d{5}$/, 'Pincode must be 6 digits');
+export const indianPincodeSchema = z.string().regex(/^[1-9]\d{5}$/, 'Pincode must be 6 digits');
 
 export const currencyINR = z.number().nonnegative().multipleOf(0.01);
 

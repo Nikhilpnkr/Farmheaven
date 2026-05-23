@@ -1,11 +1,11 @@
-import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { formatAge } from '@/lib/livestock/format-age';
+import { getAnimal } from '@/lib/livestock/queries';
+import { ACQUISITION_KIND_LABELS, SEX_LABELS } from '@/lib/livestock/schemas';
 import type { Database } from '@farmheaven/db';
 import { createClient } from '@farmheaven/db/server';
-import { getAnimal } from '@/lib/livestock/queries';
-import { formatAge } from '@/lib/livestock/format-age';
-import { SEX_LABELS, ACQUISITION_KIND_LABELS } from '@/lib/livestock/schemas';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import Link from 'next/link';
+import { notFound, redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,7 +49,9 @@ export default async function AnimalDetailPage({
       <header className="mt-2 mb-6">
         <h1 className="text-2xl font-bold tracking-tight">
           {headline}
-          {animal.name ? <span className="ml-2 font-mono text-base text-muted-foreground">· {animal.tag}</span> : null}
+          {animal.name ? (
+            <span className="ml-2 font-mono text-base text-muted-foreground">· {animal.tag}</span>
+          ) : null}
         </h1>
         {summary && <p className="mt-1 text-sm text-muted-foreground">{summary}</p>}
       </header>
@@ -57,9 +59,19 @@ export default async function AnimalDetailPage({
       <Section title="Basics">
         <Row label="Tag" value={animal.tag} mono />
         <Row label="Name" value={animal.name ?? '—'} />
-        <Row label="Species" value={animal.breed_label ? `${animal.species_label} (${animal.breed_label})` : animal.species_label} />
+        <Row
+          label="Species"
+          value={
+            animal.breed_label
+              ? `${animal.species_label} (${animal.breed_label})`
+              : animal.species_label
+          }
+        />
         <Row label="Sex" value={SEX_LABELS[animal.sex]} />
-        <Row label="Date of birth" value={animal.date_of_birth ? `${animal.date_of_birth}  (${age})` : '—'} />
+        <Row
+          label="Date of birth"
+          value={animal.date_of_birth ? `${animal.date_of_birth}  (${age})` : '—'}
+        />
         <Row label="Health state" value={animal.health_state} />
         <Row label="Lifecycle" value={animal.lifecycle ?? '—'} />
         {animal.rfid_tag && <Row label="RFID tag" value={animal.rfid_tag} mono />}
@@ -74,7 +86,11 @@ export default async function AnimalDetailPage({
             animal.dam ? (
               <Link href={`/livestock/${animal.dam.id}`} className="text-primary hover:underline">
                 {animal.dam.name || animal.dam.tag}
-                {animal.dam.name ? <span className="ml-1 font-mono text-xs text-muted-foreground">· {animal.dam.tag}</span> : null}
+                {animal.dam.name ? (
+                  <span className="ml-1 font-mono text-xs text-muted-foreground">
+                    · {animal.dam.tag}
+                  </span>
+                ) : null}
               </Link>
             ) : (
               '—'
@@ -87,7 +103,11 @@ export default async function AnimalDetailPage({
             animal.sire ? (
               <Link href={`/livestock/${animal.sire.id}`} className="text-primary hover:underline">
                 {animal.sire.name || animal.sire.tag}
-                {animal.sire.name ? <span className="ml-1 font-mono text-xs text-muted-foreground">· {animal.sire.tag}</span> : null}
+                {animal.sire.name ? (
+                  <span className="ml-1 font-mono text-xs text-muted-foreground">
+                    · {animal.sire.tag}
+                  </span>
+                ) : null}
               </Link>
             ) : (
               '—'
@@ -99,10 +119,21 @@ export default async function AnimalDetailPage({
       <Section title="Acquisition">
         <Row
           label="Kind"
-          value={animal.acquisition_kind ? ACQUISITION_KIND_LABELS[animal.acquisition_kind as keyof typeof ACQUISITION_KIND_LABELS] ?? animal.acquisition_kind : '—'}
+          value={
+            animal.acquisition_kind
+              ? (ACQUISITION_KIND_LABELS[
+                  animal.acquisition_kind as keyof typeof ACQUISITION_KIND_LABELS
+                ] ?? animal.acquisition_kind)
+              : '—'
+          }
         />
         <Row label="Date" value={animal.acquired_at ?? '—'} />
-        <Row label="Cost" value={animal.acquisition_cost !== null ? `₹${animal.acquisition_cost.toLocaleString()}` : '—'} />
+        <Row
+          label="Cost"
+          value={
+            animal.acquisition_cost !== null ? `₹${animal.acquisition_cost.toLocaleString()}` : '—'
+          }
+        />
         <Row label="Source" value={animal.acquisition_source ?? '—'} />
       </Section>
 

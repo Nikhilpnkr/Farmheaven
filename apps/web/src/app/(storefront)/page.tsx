@@ -1,26 +1,15 @@
+import { BadgeCheck, Heart, MapPin, Sprout } from 'lucide-react';
 import Link from 'next/link';
 
 export default function HomePage() {
   return (
     <main>
-      {/* Hero */}
+      {/* Hero — single composition: H1 + sub + CTAs. Trust signals
+          moved to a dedicated strip below the hero so the first viewport
+          stays calm and brand-forward per CLAUDE.md design hard rules. */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#8FAF6E] via-[#6B8E50] to-[#4E7038] px-6 py-24 text-white">
-        <div className="absolute right-8 top-8 flex flex-wrap justify-end gap-2">
-          <span className="rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-foreground backdrop-blur">
-            🌾 PGS-India
-          </span>
-          <span className="rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-foreground backdrop-blur">
-            ❤️ 94% stress-free hrs
-          </span>
-          <span className="rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-foreground backdrop-blur">
-            🌧 2.14 tCO₂e sequestered
-          </span>
-        </div>
         <div className="mx-auto max-w-5xl">
-          <span className="inline-block rounded-full bg-white/20 px-3.5 py-1 text-sm backdrop-blur">
-            🌾 Certified organic · PGS-India
-          </span>
-          <h1 className="mt-4 font-brand text-5xl font-bold tracking-tight sm:text-6xl">
+          <h1 className="font-brand text-5xl font-bold tracking-tight sm:text-6xl">
             Real food from a real farm,
             <br />
             72 acres outside Hyderabad.
@@ -32,25 +21,65 @@ export default function HomePage() {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/subscribe"
-              className="rounded-lg bg-white px-6 py-3.5 font-semibold text-leaf-600 shadow-elev-2"
+              className="inline-flex h-11 items-center rounded-lg bg-white px-6 font-semibold text-leaf-600 shadow-elev-2"
             >
-              🛒 Start a weekly box · ₹999
+              Start a weekly box · ₹999
             </Link>
             <Link
               href="/meet-the-farm"
-              className="rounded-lg border border-white/30 bg-white/15 px-6 py-3.5 font-semibold backdrop-blur"
+              className="inline-flex h-11 items-center rounded-lg border border-white/30 bg-white/15 px-6 font-semibold backdrop-blur"
             >
-              ▶ Watch the farm tour
+              Watch the farm tour
             </Link>
           </div>
         </div>
+      </section>
+
+      {/* Trust signals — quiet strip between hero and harvest. Lucide
+          icons (no emoji) per CLAUDE.md AI-slop blacklist item #7. Real
+          numbers, no placeholder badges. 2x2 on mobile, single row from
+          sm: up. */}
+      <section className="border-b border-border bg-card">
+        <ul className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-5 px-4 py-8 sm:grid-cols-4">
+          <li className="flex items-center gap-3">
+            <BadgeCheck aria-hidden className="size-5 shrink-0 text-primary" />
+            <div className="min-w-0">
+              <div className="truncate text-sm font-semibold">Certified organic</div>
+              <div className="truncate text-xs text-muted-foreground">PGS-India verified</div>
+            </div>
+          </li>
+          <li className="flex items-center gap-3">
+            <Heart aria-hidden className="size-5 shrink-0 text-primary" />
+            <div className="min-w-0">
+              <div className="truncate text-sm font-semibold">94% stress-free</div>
+              <div className="truncate text-xs text-muted-foreground">welfare-audited hrs</div>
+            </div>
+          </li>
+          <li className="flex items-center gap-3">
+            <Sprout aria-hidden className="size-5 shrink-0 text-primary" />
+            <div className="min-w-0">
+              <div className="truncate text-sm font-semibold">2.14 tCO₂e</div>
+              <div className="truncate text-xs text-muted-foreground">sequestered YTD</div>
+            </div>
+          </li>
+          <li className="flex items-center gap-3">
+            <MapPin aria-hidden className="size-5 shrink-0 text-primary" />
+            <div className="min-w-0">
+              <div className="truncate text-sm font-semibold">72 acres</div>
+              <div className="truncate text-xs text-muted-foreground">outside Hyderabad</div>
+            </div>
+          </li>
+        </ul>
       </section>
 
       {/* Today's harvest */}
       <section className="mx-auto max-w-6xl px-4 py-16">
         <div className="mb-6 flex items-end justify-between">
           <h2 className="font-brand text-3xl font-bold">Today's harvest</h2>
-          <Link href="/shop" className="text-sm font-semibold text-primary hover:underline">
+          <Link
+            href="/shop"
+            className="inline-flex h-11 items-center text-sm font-semibold text-primary hover:underline"
+          >
             See all products →
           </Link>
         </div>
@@ -84,9 +113,7 @@ export default function HomePage() {
         <div className="rounded-3xl border border-leaf-500 bg-gradient-to-br from-leaf-50 to-turmeric-50 p-10">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <div>
-              <h3 className="font-brand text-3xl font-bold">
-                Meet the cow behind your milk.
-              </h3>
+              <h3 className="font-brand text-3xl font-bold">Meet the cow behind your milk.</h3>
               <p className="mt-2 max-w-xl text-base text-muted-foreground">
                 Every pack has a QR code. Scan it — see which animal, which plot, who milked, who
                 packed. Real traceability, not a sticker.

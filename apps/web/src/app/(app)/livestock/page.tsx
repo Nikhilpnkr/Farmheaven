@@ -1,8 +1,16 @@
-import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { formatAge } from '@/lib/livestock/format-age';
+import {
+  getCurrentFarmIdFromMembership,
+  listAnimals,
+  listBreedsForForm,
+  listSpeciesForForm,
+  listStructuresForFarm,
+} from '@/lib/livestock/queries';
+import { SEX_LABELS } from '@/lib/livestock/schemas';
 import type { Database } from '@farmheaven/db';
 import { createClient } from '@farmheaven/db/server';
+import { Button } from '@farmheaven/ui/components/ui/button';
+import { Input } from '@farmheaven/ui/components/ui/input';
 import {
   Table,
   TableBody,
@@ -11,17 +19,9 @@ import {
   TableHeader,
   TableRow,
 } from '@farmheaven/ui/components/ui/table';
-import { Button } from '@farmheaven/ui/components/ui/button';
-import { Input } from '@farmheaven/ui/components/ui/input';
-import {
-  listAnimals,
-  listBreedsForForm,
-  listSpeciesForForm,
-  listStructuresForFarm,
-  getCurrentFarmIdFromMembership,
-} from '@/lib/livestock/queries';
-import { formatAge } from '@/lib/livestock/format-age';
-import { SEX_LABELS } from '@/lib/livestock/schemas';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { RegisterAnimalSheet } from './_components/register-animal-sheet';
 
 export const dynamic = 'force-dynamic';
@@ -93,9 +93,10 @@ export default async function LivestockPage({
       page: page === 1 ? undefined : String(page),
       ...overrides,
     };
-    return Object.fromEntries(
-      Object.entries(merged).filter(([, v]) => v !== undefined),
-    ) as Record<string, string>;
+    return Object.fromEntries(Object.entries(merged).filter(([, v]) => v !== undefined)) as Record<
+      string,
+      string
+    >;
   }
 
   return (
@@ -104,7 +105,9 @@ export default async function LivestockPage({
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Livestock</h1>
           <p className="text-sm text-muted-foreground">
-            {totalCount === 0 ? 'No animals yet' : `${totalCount.toLocaleString()} ${totalCount === 1 ? 'animal' : 'animals'}`}
+            {totalCount === 0
+              ? 'No animals yet'
+              : `${totalCount.toLocaleString()} ${totalCount === 1 ? 'animal' : 'animals'}`}
           </p>
         </div>
         <RegisterAnimalSheet species={species} breeds={breeds} structures={structures} />
@@ -120,12 +123,7 @@ export default async function LivestockPage({
         />
         {speciesFilter && <input type="hidden" name="species" value={speciesFilter} />}
         <label className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <input
-            type="checkbox"
-            name="retired"
-            value="1"
-            defaultChecked={includeRetired}
-          />
+          <input type="checkbox" name="retired" value="1" defaultChecked={includeRetired} />
           Show retired
         </label>
         <Button type="submit" size="sm" variant="secondary">
@@ -136,7 +134,10 @@ export default async function LivestockPage({
       {/* Species pills */}
       <nav className="mb-4 flex flex-wrap gap-1.5">
         <PillLink
-          href={{ pathname: '/livestock', query: buildQuery({ species: undefined, page: undefined }) }}
+          href={{
+            pathname: '/livestock',
+            query: buildQuery({ species: undefined, page: undefined }),
+          }}
           active={!speciesFilter}
         >
           All
@@ -144,7 +145,10 @@ export default async function LivestockPage({
         {species.map((s) => (
           <PillLink
             key={s.code}
-            href={{ pathname: '/livestock', query: buildQuery({ species: s.code, page: undefined }) }}
+            href={{
+              pathname: '/livestock',
+              query: buildQuery({ species: s.code, page: undefined }),
+            }}
             active={speciesFilter === s.code}
           >
             {s.label}
@@ -169,7 +173,12 @@ export default async function LivestockPage({
                 <TableHead>Species</TableHead>
                 <TableHead>Sex</TableHead>
                 <TableHead>
-                  <SortLink current={order === 'date_of_birth'} dir={dir} buildQuery={buildQuery} col="date_of_birth">
+                  <SortLink
+                    current={order === 'date_of_birth'}
+                    dir={dir}
+                    buildQuery={buildQuery}
+                    col="date_of_birth"
+                  >
                     Age
                   </SortLink>
                 </TableHead>
@@ -184,10 +193,14 @@ export default async function LivestockPage({
                   <TableCell>{row.name ?? '—'}</TableCell>
                   <TableCell>
                     {row.species_label}
-                    {row.breed_label ? <span className="text-muted-foreground"> · {row.breed_label}</span> : null}
+                    {row.breed_label ? (
+                      <span className="text-muted-foreground"> · {row.breed_label}</span>
+                    ) : null}
                   </TableCell>
                   <TableCell>{SEX_LABELS[row.sex]}</TableCell>
-                  <TableCell className="font-mono text-xs">{formatAge(row.date_of_birth)}</TableCell>
+                  <TableCell className="font-mono text-xs">
+                    {formatAge(row.date_of_birth)}
+                  </TableCell>
                   <TableCell>{row.structure_name ?? '—'}</TableCell>
                   <TableCell className="text-right">
                     <Button asChild size="sm" variant="ghost">
@@ -206,7 +219,9 @@ export default async function LivestockPage({
         <nav className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
           {page > 1 ? (
             <Button asChild size="sm" variant="ghost">
-              <Link href={{ pathname: '/livestock', query: buildQuery({ page: String(page - 1) }) }}>
+              <Link
+                href={{ pathname: '/livestock', query: buildQuery({ page: String(page - 1) }) }}
+              >
                 ‹‹ Prev
               </Link>
             </Button>
@@ -220,7 +235,9 @@ export default async function LivestockPage({
           </span>
           {page < totalPages ? (
             <Button asChild size="sm" variant="ghost">
-              <Link href={{ pathname: '/livestock', query: buildQuery({ page: String(page + 1) }) }}>
+              <Link
+                href={{ pathname: '/livestock', query: buildQuery({ page: String(page + 1) }) }}
+              >
                 Next ››
               </Link>
             </Button>
