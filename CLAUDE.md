@@ -4,13 +4,13 @@
 
 ## Current state (2026-05-23)
 
-- **Active branch:** `feat/collapse-phase-0` open as [PR #1](https://github.com/Nikhilpnkr/Farmheaven/pull/1) — TDD Sentry SDK wiring + TS-debt cleanup + app-router icon/OG images
-- **Shipped on `main`:** 3-app → 1-app collapse · Phase 0 (phone-OTP auth + onboarding via `bootstrap_farm` RPC) · Meadow theme + dual light/dark · Super-admin `/admin/[table]` browser · Phase 1A livestock registry
-- **Live preview:** `https://farmheaven-web-git-main-badgers-projects-c8635f3c.vercel.app` — Vercel deployment-protected, use the Vercel MCP `get_access_to_vercel_url` for a 23-hour bypass token. `farmheaven.in` not yet mapped.
+- **Workflow:** Direct-to-`main`, no feature branches, no PRs. See "Commit & main-line policy" below for the full rules. PR #1 was the final feature-branch PR before the cutover; it landed as merge commit `be65eb8`.
+- **Shipped on `main`:** 3-app → 1-app collapse · Phase 0 (phone-OTP auth + onboarding via `bootstrap_farm` RPC) · Meadow theme + dual light/dark · Super-admin `/admin/[table]` browser · Phase 1A livestock registry · TDD-wired Sentry SDK across all 3 runtimes · TS strict (no `ignoreBuildErrors`) · app-router icon/apple-icon/opengraph-image · storefront 44px-tap-target hardening · hero-trust-strip redesign replacing emoji badges · CI workflow fixed (pnpm setup + supabase secret guard) · biome 0 errors across 128 files
+- **Live:** `https://farmheaven-web-git-main-badgers-projects-c8635f3c.vercel.app` — Vercel deployment-protected, use the Vercel MCP `get_access_to_vercel_url` for a 23-hour bypass token. `farmheaven.in` not yet mapped.
 - **Migrations applied:** 19 (`01_extensions` → `19_super_admin_column`)
 - **Test suite:** 32 cases across 7 files, ~1.3s runtime
 - **Vercel projects:** 1 active (`farmheaven-web`) · 3 zombies from pre-collapse (`farmheaven-console/storefront/worker`) that auto-cancel on every push — delete in dashboard when convenient
-- **Design baseline:** B+ composite, B AI-slop. Full audit + screenshots at `.design-audit/` (gitignored). 3 high-impact open: 14 sub-44px tap targets on storefront, `/login` phone input at 40px, hero badge-cluster wrap on mobile.
+- **Design baseline:** B+ composite, B AI-slop. Full audit at `.design-audit/` (gitignored). FINDING-001 (14 tap targets), FINDING-003 (favicon/OG 404s), FINDING-004 (badge cluster) closed. **Still open:** FINDING-002 (`/login` phone input at 40px, needs `h-11`) — trivial; bundle into next storefront touch.
 - **Next up:** Phase 1B per `C:\Users\pc\Downloads\FARMHEAVEN_BUILD_PLAN.md` — likely flocks or the unified `events` table.
 
 ## Stack
